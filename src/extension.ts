@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
+import * as fs from 'fs';
 
 export function activate(context: vscode.ExtensionContext) {
     console.log('Spadework Companion active');
@@ -12,10 +13,17 @@ export function activate(context: vscode.ExtensionContext) {
             { enableScripts: true }
         );
 
-        panel.webview.html = getDiagramHtml();
+        panel.webview.html = getDiagramHtml(context, panel);
 
-        // Handle node clicks from the webview
+        // Single handler for ALL messages from the webview
         panel.webview.onDidReceiveMessage(async (message) => {
+
+            if (message.command === 'ready') {
+                const diagramPath = path.join(context.extensionPath, 'diagrams', 'jwt-refresh.json');
+                const diagramJson = fs.readFileSync(diagramPath, 'utf8');
+                panel.webview.postMessage({ command: 'loadDiagram', data: JSON.parse(diagramJson) });
+            }
+
             if (message.command === 'openFile') {
                 const workspaceRoot = vscode.workspace.workspaceFolders?.[0].uri.fsPath;
                 if (!workspaceRoot) return;
@@ -39,74 +47,26 @@ export function activate(context: vscode.ExtensionContext) {
 
 export function deactivate() {}
 
-function getDiagramHtml(): string {
+function getDiagramHtml(context: vscode.ExtensionContext, panel: vscode.WebviewPanel): string {
+    const rendererUri = panel.webview.asWebviewUri(
+        vscode.Uri.joinPath(context.extensionUri, 'media', 'renderer.js')
+    );
+
     return `<!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src ${panel.webview.cspSource}; style-src 'unsafe-inline';">
     <style>
-        body { background: #1e1e1e; color: #ccc; font-family: sans-serif; padding: 20px; }
-        svg { width: 100%; height: 500px; }
-        .node { cursor: pointer; }
-        .node rect { fill: #2d5a8e; stroke: #4a9eff; stroke-width: 2; rx: 6; }
-        .node:hover rect { fill: #3a6fa8; }
-        .node text { fill: #fff; font-size: 13px; text-anchor: middle; dominant-baseline: middle; }
-        .arrow { stroke: #4a9eff; stroke-width: 2; fill: none; marker-end: url(#arrowhead); }
-        .label { fill: #aaa; font-size: 11px; }
+        body { background: #1e1e1e; color: #ccc; font-family: sans-serif; margin: 0; padding: 16px; }
+        h3 { color: #4a9eff; margin-bottom: 12px; }
+        svg { width: 100%; }
     </style>
 </head>
 <body>
-    <h3 style="color:#4a9eff">JWT Refresh Flow — Ewan Millar</h3>
-    <svg viewBox="0 0 600 480" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-            <marker id="arrowhead" markerWidth="10" markerHeight="7"
-                refX="10" refY="3.5" orient="auto">
-                <polygon points="0 0, 10 3.5, 0 7" fill="#4a9eff" />
-            </marker>
-        </defs>
-
-        <!-- Node 1: API Request -->
-        <g class="node" onclick="openFile('frontend/src/api/axios.js', 1)">
-            <rect x="200" y="20" width="200" height="44" rx="6"/>
-            <text x="300" y="42">Axios API Request</text>
-        </g>
-
-        <!-- Node 2: 401 Interceptor -->
-        <g class="node" onclick="openFile('frontend/src/api/axios.js', 25)">
-            <rect x="200" y="120" width="200" height="44" rx="6"/>
-            <text x="300" y="142">401 Interceptor Fires</text>
-        </g>
-
-        <!-- Node 3: Refresh Token -->
-        <g class="node" onclick="openFile('frontend/src/api/axios.js', 47)">
-            <rect x="200" y="220" width="200" height="44" rx="6"/>
-            <text x="300" y="242">POST /auth/token/refresh</text>
-        </g>
-
-        <!-- Node 4: Retry -->
-        <g class="node" onclick="openFile('frontend/src/api/axios.js', 60)">
-            <rect x="200" y="320" width="200" height="44" rx="6"/>
-            <text x="300" y="342">Retry Original Request</text>
-        </g>
-
-        <!-- Node 5: Response -->
-        <g class="node" onclick="openFile('frontend/src/stores/useAuthStore.js', 12)">
-            <rect x="200" y="420" width="200" height="44" rx="6"/>
-            <text x="300" y="442">Return to Component</text>
-        </g>
-
-        <!-- Arrows -->
-        <line x1="300" y1="64" x2="300" y2="118" class="arrow"/>
-        <line x1="300" y1="164" x2="300" y2="218" class="arrow"/>
-        <line x1="300" y1="264" x2="300" y2="318" class="arrow"/>
-        <line x1="300" y1="364" x2="300" y2="418" class="arrow"/>
-    </svg>
-
-    <script>
-        const vscode = acquireVsCodeApi();
-        function openFile(file, line) {
-            vscode.postMessage({ command: 'openFile', file, line });
-        }
-    </script>
+    <h3>JWT Refresh Flow — Ewan Millar</h3>
+    <svg id="diagram" xmlns="http://www.w3.org/2000/svg"></svg>
+    <script src="${rendererUri}"></script>
 </body>
 </html>`;
 }
