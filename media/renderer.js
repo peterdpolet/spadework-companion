@@ -13,20 +13,75 @@
         }
     });
 
+    // ── Tooltip ───────────────────────────────────────────────────────────────
+
+    const tooltip = document.createElement('div');
+    tooltip.style.cssText = [
+        'position:fixed',
+        'background:#252526',
+        'border:1px solid #4a9eff',
+        'border-radius:6px',
+        'padding:8px 12px',
+        'font-size:12px',
+        'color:#ccc',
+        'max-width:280px',
+        'line-height:1.5',
+        'pointer-events:none',
+        'opacity:0',
+        'transition:opacity 0.15s',
+        'z-index:999',
+        'box-shadow:0 4px 12px rgba(0,0,0,0.4)',
+    ].join(';');
+    document.body.appendChild(tooltip);
+
+    function showTooltip(e, node) {
+        if (!node.trace) { return; }
+        tooltip.innerHTML =
+            '<div style="color:#4a9eff;font-weight:600;margin-bottom:4px">' + escHtml(node.label.replace(/\n/g, ' ')) + '</div>' +
+            '<div>' + escHtml(node.trace) + '</div>' +
+            '<div style="margin-top:6px;color:#666;font-size:11px">' + escHtml(node.file) + ':' + node.line + '</div>';
+        tooltip.style.opacity = '1';
+        moveTooltip(e);
+    }
+
+    function moveTooltip(e) {
+        const x = e.clientX + 14;
+        const y = e.clientY - 10;
+        tooltip.style.left = x + 'px';
+        tooltip.style.top  = y + 'px';
+    }
+
+    function hideTooltip() {
+        tooltip.style.opacity = '0';
+    }
+
+    function escHtml(str) {
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
+
+    // ── Renderer ──────────────────────────────────────────────────────────────
+
     function renderDiagram(data) {
         console.log('renderDiagram called');
 
         const SVG_NS = 'http://www.w3.org/2000/svg';
         const NODE_W = 180;
         const NODE_H = 44;
-        const COL_X = 300;
-        const ROW_H = 100;
+        const COL_X  = 300;
+        const ROW_H  = 100;
 
         const COLOURS = {
             event:    { fill: '#1a3a5c', stroke: '#4a9eff' },
             function: { fill: '#2d5a2d', stroke: '#4aff6f' },
             decision: { fill: '#5a3a1a', stroke: '#ffaa4a' }
         };
+
+        // Nodes with a trace description get a subtle highlight ring
+        const TRACE_RING = '#9b6dff';
 
         const positions = {};
         data.nodes.forEach(function(node, i) {
@@ -41,9 +96,7 @@
         function el(tag, attrs) {
             attrs = attrs || {};
             const e = document.createElementNS(SVG_NS, tag);
-            Object.keys(attrs).forEach(function(k) {
-                e.setAttribute(k, attrs[k]);
-            });
+            Object.keys(attrs).forEach(function(k) { e.setAttribute(k, attrs[k]); });
             return e;
         }
 
@@ -56,18 +109,19 @@
         defs.appendChild(marker);
         svgEl.appendChild(defs);
 
+        // ── Edges ─────────────────────────────────────────────────────────────
+
         data.edges.forEach(function(edge) {
             const from = positions[edge.from];
-            const to = positions[edge.to];
+            const to   = positions[edge.to];
             if (!from || !to) { return; }
 
-            const line = el('line', {
+            svgEl.appendChild(el('line', {
                 x1: from.x, y1: from.y + NODE_H / 2,
-                x2: to.x,   y2: to.y - NODE_H / 2,
+                x2: to.x,   y2: to.y   - NODE_H / 2,
                 stroke: '#555', 'stroke-width': '2',
                 'marker-end': 'url(#arrow)'
-            });
-            svgEl.appendChild(line);
+            }));
 
             if (edge.label) {
                 const t = el('text', {
@@ -81,23 +135,50 @@
             }
         });
 
+        // ── Nodes ─────────────────────────────────────────────────────────────
+
         data.nodes.forEach(function(node) {
             const pos = positions[node.id];
-            const cx = pos.x;
-            const cy = pos.y;
+            const cx  = pos.x;
+            const cy  = pos.y;
             const col = COLOURS[node.type] || COLOURS.function;
+            const hasTrace = !!node.trace;
 
             const g = el('g');
             g.style.cursor = 'pointer';
+
             g.addEventListener('click', function() {
                 vscode.postMessage({ command: 'openFile', file: node.file, line: node.line });
             });
 
+            g.addEventListener('mouseenter', function(e) { showTooltip(e, node); });
+            g.addEventListener('mousemove',  function(e) { moveTooltip(e); });
+            g.addEventListener('mouseleave', hideTooltip);
+
+            // Optional trace ring (drawn behind the node shape)
+            if (hasTrace) {
+                if (node.type === 'decision') {
+                    const hw = NODE_W / 2 + 4;
+                    const hh = NODE_H / 2 + 10;
+                    g.appendChild(el('polygon', {
+                        points: cx+','+(cy-hh)+' '+(cx+hw)+','+cy+' '+cx+','+(cy+hh)+' '+(cx-hw)+','+cy,
+                        fill: 'none', stroke: TRACE_RING, 'stroke-width': '1', opacity: '0.5'
+                    }));
+                } else {
+                    g.appendChild(el('rect', {
+                        x: cx - NODE_W / 2 - 3, y: cy - NODE_H / 2 - 3,
+                        width: NODE_W + 6, height: NODE_H + 6,
+                        rx: node.type === 'event' ? NODE_H / 2 + 3 : '6',
+                        fill: 'none', stroke: TRACE_RING, 'stroke-width': '1', opacity: '0.5'
+                    }));
+                }
+            }
+
+            // Node shape
             if (node.type === 'event') {
                 g.appendChild(el('rect', {
                     x: cx - NODE_W / 2, y: cy - NODE_H / 2,
-                    width: NODE_W, height: NODE_H,
-                    rx: NODE_H / 2,
+                    width: NODE_W, height: NODE_H, rx: NODE_H / 2,
                     fill: col.fill, stroke: col.stroke, 'stroke-width': '2'
                 }));
             } else if (node.type === 'decision') {
@@ -115,8 +196,9 @@
                 }));
             }
 
-            const lines = node.label.split('\n');
-            const lineH = 14;
+            // Label text
+            const lines  = node.label.split('\n');
+            const lineH  = 14;
             const startY = cy - ((lines.length - 1) * lineH) / 2;
             lines.forEach(function(lineText, i) {
                 const t = el('text', {
@@ -127,6 +209,16 @@
                 t.textContent = lineText;
                 g.appendChild(t);
             });
+
+            // Small dot indicator when trace description exists
+            if (hasTrace) {
+                g.appendChild(el('circle', {
+                    cx: cx + NODE_W / 2 - 6,
+                    cy: cy - NODE_H / 2 + 6,
+                    r: '4',
+                    fill: TRACE_RING
+                }));
+            }
 
             const title = el('title');
             title.textContent = node.file + ':' + node.line;
