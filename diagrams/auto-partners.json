@@ -1,0 +1,74 @@
+{
+  "id": "auto-partners",
+  "title": "Partners \u2014 Auto",
+  "layout": "vertical",
+  "auto": true,
+  "nodes": [
+    {
+      "id": "backend/partners/api/filters.py:BusinessPartnerFilter",
+      "label": "BusinessPartnerFilter",
+      "file": "backend/partners/api/filters.py",
+      "line": 4,
+      "type": "event",
+      "trace": null
+    },
+    {
+      "id": "backend/partners/api/serializers.py:BusinessPartnerSerializer",
+      "label": "BusinessPartnerSerializer",
+      "file": "backend/partners/api/serializers.py",
+      "line": 6,
+      "type": "event",
+      "trace": null
+    },
+    {
+      "id": "backend/partners/api/serializers.py:CustomerSerializer",
+      "label": "CustomerSerializer",
+      "file": "backend/partners/api/serializers.py",
+      "line": 12,
+      "type": "event",
+      "trace": null
+    },
+    {
+      "id": "backend/partners/views.py:BusinessPartnerListCreateAPIView",
+      "label": "BusinessPartnerListCreateAPIView",
+      "file": "backend/partners/views.py",
+      "line": 21,
+      "type": "event",
+      "trace": null
+    },
+    {
+      "id": "backend/partners/views.py:BusinessPartnerListCreateAPIView.get_queryset",
+      "label": "BusinessPartnerListCreateAPIView.get_queryset",
+      "file": "backend/partners/views.py",
+      "line": 30,
+      "type": "function",
+      "trace": null
+    },
+    {
+      "id": "backend/partners/views.py:CustomerListCreateAPIView",
+      "label": "CustomerListCreateAPIView",
+      "file": "backend/partners/views.py",
+      "line": 39,
+      "type": "event",
+      "trace": null
+    },
+    {
+      "id": "backend/partners/views.py:CustomerListCreateAPIView.get_queryset",
+      "label": "CustomerListCreateAPIView.get_queryset",
+      "file": "backend/partners/views.py",
+      "line": 43,
+      "type": "function",
+      "trace": null
+    }
+  ],
+  "edges": [
+    {
+      "from": "backend/partners/views.py:BusinessPartnerListCreateAPIView",
+      "to": "backend/partners/views.py:BusinessPartnerListCreateAPIView.get_queryset"
+    },
+    {
+      "from": "backend/partners/views.py:CustomerListCreateAPIView",
+      "to": "backend/partners/views.py:CustomerListCreateAPIView.get_queryset"
+    }
+  ]
+}

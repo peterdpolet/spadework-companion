@@ -1,0 +1,106 @@
+{
+  "id": "auto-sales",
+  "title": "Sales \u2014 Auto",
+  "layout": "vertical",
+  "auto": true,
+  "nodes": [
+    {
+      "id": "backend/sales/serializers.py:SalesOrderLineSerializer",
+      "label": "SalesOrderLineSerializer",
+      "file": "backend/sales/serializers.py",
+      "line": 5,
+      "type": "event",
+      "trace": null
+    },
+    {
+      "id": "backend/sales/views.py:SalesOrderViewSet",
+      "label": "SalesOrderViewSet",
+      "file": "backend/sales/views.py",
+      "line": 17,
+      "type": "event",
+      "trace": null
+    },
+    {
+      "id": "backend/sales/views.py:SalesOrderViewSet.perform_create",
+      "label": "SalesOrderViewSet.perform_create",
+      "file": "backend/sales/views.py",
+      "line": 21,
+      "type": "function",
+      "trace": null
+    },
+    {
+      "id": "backend/sales/serializers.py:SalesOrderSerializer",
+      "label": "SalesOrderSerializer",
+      "file": "backend/sales/serializers.py",
+      "line": 24,
+      "type": "event",
+      "trace": null
+    },
+    {
+      "id": "backend/sales/views.py:SalesOrderViewSet.get_queryset",
+      "label": "SalesOrderViewSet.get_queryset",
+      "file": "backend/sales/views.py",
+      "line": 24,
+      "type": "function",
+      "trace": null
+    },
+    {
+      "id": "backend/sales/views.py:SalesOrderLineViewSet",
+      "label": "SalesOrderLineViewSet",
+      "file": "backend/sales/views.py",
+      "line": 34,
+      "type": "event",
+      "trace": null
+    },
+    {
+      "id": "backend/sales/views.py:SalesOrderLineViewSet.get_queryset",
+      "label": "SalesOrderLineViewSet.get_queryset",
+      "file": "backend/sales/views.py",
+      "line": 38,
+      "type": "function",
+      "trace": null
+    },
+    {
+      "id": "backend/sales/serializers.py:ApprovalNoteSerializer",
+      "label": "ApprovalNoteSerializer",
+      "file": "backend/sales/serializers.py",
+      "line": 43,
+      "type": "event",
+      "trace": null
+    },
+    {
+      "id": "backend/sales/views.py:SalesOrderLineViewSet.upload_token",
+      "label": "SalesOrderLineViewSet.upload_token",
+      "file": "backend/sales/views.py",
+      "line": 46,
+      "type": "function",
+      "trace": "Generate a short-lived signed upload token for this line."
+    },
+    {
+      "id": "backend/sales/views.py:ApprovalNoteViewSet",
+      "label": "ApprovalNoteViewSet",
+      "file": "backend/sales/views.py",
+      "line": 86,
+      "type": "event",
+      "trace": null
+    }
+  ],
+  "edges": [
+    {
+      "from": "backend/sales/views.py:SalesOrderViewSet",
+      "to": "backend/sales/views.py:SalesOrderViewSet.perform_create"
+    },
+    {
+      "from": "backend/sales/views.py:SalesOrderViewSet",
+      "to": "backend/sales/views.py:SalesOrderViewSet.get_queryset"
+    },
+    {
+      "from": "backend/sales/views.py:SalesOrderLineViewSet",
+      "to": "backend/sales/views.py:SalesOrderLineViewSet.get_queryset"
+    },
+    {
+      "from": "backend/sales/views.py:SalesOrderLineViewSet",
+      "to": "backend/sales/views.py:SalesOrderLineViewSet.upload_token"
+    }
+  ]
+}

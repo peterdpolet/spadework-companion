@@ -1,0 +1,382 @@
+{
+  "id": "auto-inventory",
+  "title": "Inventory \u2014 Auto",
+  "layout": "vertical",
+  "auto": true,
+  "nodes": [
+    {
+      "id": "backend/inventory/filters.py:ItemFilter",
+      "label": "ItemFilter",
+      "file": "backend/inventory/filters.py",
+      "line": 4,
+      "type": "event",
+      "trace": null
+    },
+    {
+      "id": "backend/inventory/serializers.py:ColourSerializer",
+      "label": "ColourSerializer",
+      "file": "backend/inventory/serializers.py",
+      "line": 15,
+      "type": "event",
+      "trace": null
+    },
+    {
+      "id": "backend/inventory/views copy.py:ItemListCreateAPIView",
+      "label": "ItemListCreateAPIView",
+      "file": "backend/inventory/views copy.py",
+      "line": 19,
+      "type": "event",
+      "trace": null
+    },
+    {
+      "id": "backend/inventory/serializers.py:ClaritySerializer",
+      "label": "ClaritySerializer",
+      "file": "backend/inventory/serializers.py",
+      "line": 21,
+      "type": "event",
+      "trace": null
+    },
+    {
+      "id": "backend/inventory/serializers.py:CutSerializer",
+      "label": "CutSerializer",
+      "file": "backend/inventory/serializers.py",
+      "line": 27,
+      "type": "event",
+      "trace": null
+    },
+    {
+      "id": "backend/inventory/views.py:ItemViewSet",
+      "label": "ItemViewSet",
+      "file": "backend/inventory/views.py",
+      "line": 27,
+      "type": "event",
+      "trace": null
+    },
+    {
+      "id": "backend/inventory/serializers.py:CurrencySerializer",
+      "label": "CurrencySerializer",
+      "file": "backend/inventory/serializers.py",
+      "line": 33,
+      "type": "event",
+      "trace": null
+    },
+    {
+      "id": "backend/inventory/views.py:ItemViewSet.get_serializer_class",
+      "label": "ItemViewSet.get_serializer_class",
+      "file": "backend/inventory/views.py",
+      "line": 34,
+      "type": "function",
+      "trace": null
+    },
+    {
+      "id": "backend/inventory/serializers.py:StoneSpeciesSerializer",
+      "label": "StoneSpeciesSerializer",
+      "file": "backend/inventory/serializers.py",
+      "line": 39,
+      "type": "event",
+      "trace": null
+    },
+    {
+      "id": "backend/inventory/views.py:ItemViewSet.get_queryset",
+      "label": "ItemViewSet.get_queryset",
+      "file": "backend/inventory/views.py",
+      "line": 39,
+      "type": "function",
+      "trace": null
+    },
+    {
+      "id": "backend/inventory/serializers.py:CertifierSerializer",
+      "label": "CertifierSerializer",
+      "file": "backend/inventory/serializers.py",
+      "line": 45,
+      "type": "event",
+      "trace": null
+    },
+    {
+      "id": "backend/inventory/serializers.py:LocationSerializer",
+      "label": "LocationSerializer",
+      "file": "backend/inventory/serializers.py",
+      "line": 51,
+      "type": "event",
+      "trace": null
+    },
+    {
+      "id": "backend/inventory/serializers.py:GemDetailSerializer",
+      "label": "GemDetailSerializer",
+      "file": "backend/inventory/serializers.py",
+      "line": 59,
+      "type": "event",
+      "trace": null
+    },
+    {
+      "id": "backend/inventory/serializers.py:ItemListSerializer",
+      "label": "ItemListSerializer",
+      "file": "backend/inventory/serializers.py",
+      "line": 82,
+      "type": "event",
+      "trace": "Lightweight serializer for list views."
+    },
+    {
+      "id": "backend/inventory/views.py:ItemViewSet.perform_create",
+      "label": "ItemViewSet.perform_create",
+      "file": "backend/inventory/views.py",
+      "line": 108,
+      "type": "function",
+      "trace": null
+    },
+    {
+      "id": "backend/inventory/views.py:ItemViewSet.ledger",
+      "label": "ItemViewSet.ledger",
+      "file": "backend/inventory/views.py",
+      "line": 112,
+      "type": "function",
+      "trace": "Return full ledger history for a specific item."
+    },
+    {
+      "id": "backend/inventory/serializers.py:ItemDetailSerializer",
+      "label": "ItemDetailSerializer",
+      "file": "backend/inventory/serializers.py",
+      "line": 116,
+      "type": "event",
+      "trace": "Full serializer for create/retrieve/update."
+    },
+    {
+      "id": "backend/inventory/views.py:ItemViewSet.gem_detail",
+      "label": "ItemViewSet.gem_detail",
+      "file": "backend/inventory/views.py",
+      "line": 132,
+      "type": "function",
+      "trace": "Create or update GemDetail for an item."
+    },
+    {
+      "id": "backend/inventory/serializers.py:StockLedgerEntryListSerializer",
+      "label": "StockLedgerEntryListSerializer",
+      "file": "backend/inventory/serializers.py",
+      "line": 146,
+      "type": "event",
+      "trace": "Lightweight serializer for ledger history lists."
+    },
+    {
+      "id": "backend/inventory/views.py:StockLedgerEntryViewSet",
+      "label": "StockLedgerEntryViewSet",
+      "file": "backend/inventory/views.py",
+      "line": 157,
+      "type": "event",
+      "trace": "Append-only ledger \u2014 no update or delete."
+    },
+    {
+      "id": "backend/inventory/views.py:StockLedgerEntryViewSet.get_queryset",
+      "label": "StockLedgerEntryViewSet.get_queryset",
+      "file": "backend/inventory/views.py",
+      "line": 172,
+      "type": "function",
+      "trace": null
+    },
+    {
+      "id": "backend/inventory/serializers.py:StockLedgerEntryCreateSerializer",
+      "label": "StockLedgerEntryCreateSerializer",
+      "file": "backend/inventory/serializers.py",
+      "line": 180,
+      "type": "event",
+      "trace": "Serializer for creating new ledger entries."
+    },
+    {
+      "id": "backend/inventory/views.py:StockLedgerEntryViewSet.get_serializer_class",
+      "label": "StockLedgerEntryViewSet.get_serializer_class",
+      "file": "backend/inventory/views.py",
+      "line": 183,
+      "type": "function",
+      "trace": null
+    },
+    {
+      "id": "backend/inventory/views.py:StockLedgerEntryViewSet.list",
+      "label": "StockLedgerEntryViewSet.list",
+      "file": "backend/inventory/views.py",
+      "line": 188,
+      "type": "function",
+      "trace": null
+    },
+    {
+      "id": "backend/inventory/serializers.py:StockLedgerEntryCreateSerializer.validate",
+      "label": "StockLedgerEntryCreateSerializer.validate",
+      "file": "backend/inventory/serializers.py",
+      "line": 212,
+      "type": "function",
+      "trace": null
+    },
+    {
+      "id": "backend/inventory/views.py:StockLedgerEntryViewSet.retrieve",
+      "label": "StockLedgerEntryViewSet.retrieve",
+      "file": "backend/inventory/views.py",
+      "line": 233,
+      "type": "function",
+      "trace": null
+    },
+    {
+      "id": "backend/inventory/views.py:StockLedgerEntryViewSet.create",
+      "label": "StockLedgerEntryViewSet.create",
+      "file": "backend/inventory/views.py",
+      "line": 238,
+      "type": "function",
+      "trace": null
+    },
+    {
+      "id": "backend/inventory/views.py:StockLedgerEntryViewSet.open_appros",
+      "label": "StockLedgerEntryViewSet.open_appros",
+      "file": "backend/inventory/views.py",
+      "line": 248,
+      "type": "function",
+      "trace": "Return all appro references that have been sent out but not yet"
+    },
+    {
+      "id": "backend/inventory/serializers.py:StockLedgerEntryCreateSerializer.create",
+      "label": "StockLedgerEntryCreateSerializer.create",
+      "file": "backend/inventory/serializers.py",
+      "line": 255,
+      "type": "function",
+      "trace": null
+    },
+    {
+      "id": "backend/inventory/views.py:StockLedgerEntryViewSet.appro_summary",
+      "label": "StockLedgerEntryViewSet.appro_summary",
+      "file": "backend/inventory/views.py",
+      "line": 279,
+      "type": "function",
+      "trace": "Summary of all open appros \u2014 stock out with customers and"
+    },
+    {
+      "id": "backend/inventory/views.py:StockLedgerEntryViewSet.stock_position",
+      "label": "StockLedgerEntryViewSet.stock_position",
+      "file": "backend/inventory/views.py",
+      "line": 299,
+      "type": "function",
+      "trace": "Count and value of items by bucket \u2014 balance sheet view."
+    },
+    {
+      "id": "backend/inventory/views.py:ColourViewSet",
+      "label": "ColourViewSet",
+      "file": "backend/inventory/views.py",
+      "line": 320,
+      "type": "event",
+      "trace": null
+    },
+    {
+      "id": "backend/inventory/views.py:ClarityViewSet",
+      "label": "ClarityViewSet",
+      "file": "backend/inventory/views.py",
+      "line": 326,
+      "type": "event",
+      "trace": null
+    },
+    {
+      "id": "backend/inventory/views.py:CutViewSet",
+      "label": "CutViewSet",
+      "file": "backend/inventory/views.py",
+      "line": 332,
+      "type": "event",
+      "trace": null
+    },
+    {
+      "id": "backend/inventory/views.py:CurrencyViewSet",
+      "label": "CurrencyViewSet",
+      "file": "backend/inventory/views.py",
+      "line": 338,
+      "type": "event",
+      "trace": null
+    },
+    {
+      "id": "backend/inventory/views.py:StoneSpeciesViewSet",
+      "label": "StoneSpeciesViewSet",
+      "file": "backend/inventory/views.py",
+      "line": 344,
+      "type": "event",
+      "trace": null
+    },
+    {
+      "id": "backend/inventory/views.py:CertifierViewSet",
+      "label": "CertifierViewSet",
+      "file": "backend/inventory/views.py",
+      "line": 350,
+      "type": "event",
+      "trace": null
+    },
+    {
+      "id": "backend/inventory/views.py:LocationViewSet",
+      "label": "LocationViewSet",
+      "file": "backend/inventory/views.py",
+      "line": 356,
+      "type": "event",
+      "trace": null
+    },
+    {
+      "id": "backend/inventory/models.py:CurrentStockView",
+      "label": "CurrentStockView",
+      "file": "backend/inventory/models.py",
+      "line": 611,
+      "type": "event",
+      "trace": "Read-only proxy \u2014 not a real DB table."
+    }
+  ],
+  "edges": [
+    {
+      "from": "backend/inventory/serializers.py:StockLedgerEntryCreateSerializer",
+      "to": "backend/inventory/serializers.py:StockLedgerEntryCreateSerializer.validate"
+    },
+    {
+      "from": "backend/inventory/serializers.py:StockLedgerEntryCreateSerializer",
+      "to": "backend/inventory/serializers.py:StockLedgerEntryCreateSerializer.create"
+    },
+    {
+      "from": "backend/inventory/views.py:ItemViewSet",
+      "to": "backend/inventory/views.py:ItemViewSet.get_serializer_class"
+    },
+    {
+      "from": "backend/inventory/views.py:ItemViewSet",
+      "to": "backend/inventory/views.py:ItemViewSet.get_queryset"
+    },
+    {
+      "from": "backend/inventory/views.py:ItemViewSet",
+      "to": "backend/inventory/views.py:ItemViewSet.perform_create"
+    },
+    {
+      "from": "backend/inventory/views.py:ItemViewSet",
+      "to": "backend/inventory/views.py:ItemViewSet.ledger"
+    },
+    {
+      "from": "backend/inventory/views.py:ItemViewSet",
+      "to": "backend/inventory/views.py:ItemViewSet.gem_detail"
+    },
+    {
+      "from": "backend/inventory/views.py:StockLedgerEntryViewSet",
+      "to": "backend/inventory/views.py:StockLedgerEntryViewSet.get_queryset"
+    },
+    {
+      "from": "backend/inventory/views.py:StockLedgerEntryViewSet",
+      "to": "backend/inventory/views.py:StockLedgerEntryViewSet.get_serializer_class"
+    },
+    {
+      "from": "backend/inventory/views.py:StockLedgerEntryViewSet",
+      "to": "backend/inventory/views.py:StockLedgerEntryViewSet.list"
+    },
+    {
+      "from": "backend/inventory/views.py:StockLedgerEntryViewSet",
+      "to": "backend/inventory/views.py:StockLedgerEntryViewSet.retrieve"
+    },
+    {
+      "from": "backend/inventory/views.py:StockLedgerEntryViewSet",
+      "to": "backend/inventory/views.py:StockLedgerEntryViewSet.create"
+    },
+    {
+      "from": "backend/inventory/views.py:StockLedgerEntryViewSet",
+      "to": "backend/inventory/views.py:StockLedgerEntryViewSet.open_appros"
+    },
+    {
+      "from": "backend/inventory/views.py:StockLedgerEntryViewSet",
+      "to": "backend/inventory/views.py:StockLedgerEntryViewSet.appro_summary"
+    },
+    {
+      "from": "backend/inventory/views.py:StockLedgerEntryViewSet",
+      "to": "backend/inventory/views.py:StockLedgerEntryViewSet.stock_position"
+    }
+  ]
+}

@@ -1,0 +1,238 @@
+{
+  "id": "auto-matching",
+  "title": "Matching \u2014 Auto",
+  "layout": "vertical",
+  "auto": true,
+  "nodes": [
+    {
+      "id": "backend/matching/serializers.py:MatchingRequestListSerializer",
+      "label": "MatchingRequestListSerializer",
+      "file": "backend/matching/serializers.py",
+      "line": 12,
+      "type": "event",
+      "trace": "Lightweight serializer for list views and batch line display."
+    },
+    {
+      "id": "backend/matching/views.py:MatchingRequestViewSet",
+      "label": "MatchingRequestViewSet",
+      "file": "backend/matching/views.py",
+      "line": 34,
+      "type": "event",
+      "trace": "CRUD for individual repair/matching requests."
+    },
+    {
+      "id": "backend/matching/serializers.py:MatchingRequestDetailSerializer",
+      "label": "MatchingRequestDetailSerializer",
+      "file": "backend/matching/serializers.py",
+      "line": 39,
+      "type": "event",
+      "trace": "Full serializer for create/retrieve/update."
+    },
+    {
+      "id": "backend/matching/views.py:MatchingRequestViewSet.get_queryset",
+      "label": "MatchingRequestViewSet.get_queryset",
+      "file": "backend/matching/views.py",
+      "line": 59,
+      "type": "function",
+      "trace": null
+    },
+    {
+      "id": "backend/matching/views.py:MatchingRequestViewSet.get_serializer_class",
+      "label": "MatchingRequestViewSet.get_serializer_class",
+      "file": "backend/matching/views.py",
+      "line": 67,
+      "type": "function",
+      "trace": null
+    },
+    {
+      "id": "backend/matching/views.py:MatchingRequestViewSet.perform_create",
+      "label": "MatchingRequestViewSet.perform_create",
+      "file": "backend/matching/views.py",
+      "line": 72,
+      "type": "function",
+      "trace": null
+    },
+    {
+      "id": "backend/matching/views.py:MatchingRequestViewSet.perform_update",
+      "label": "MatchingRequestViewSet.perform_update",
+      "file": "backend/matching/views.py",
+      "line": 75,
+      "type": "function",
+      "trace": null
+    },
+    {
+      "id": "backend/matching/serializers.py:MatchingBatchLineSerializer",
+      "label": "MatchingBatchLineSerializer",
+      "file": "backend/matching/serializers.py",
+      "line": 87,
+      "type": "event",
+      "trace": null
+    },
+    {
+      "id": "backend/matching/serializers.py:MatchingBatchSerializer",
+      "label": "MatchingBatchSerializer",
+      "file": "backend/matching/serializers.py",
+      "line": 106,
+      "type": "event",
+      "trace": null
+    },
+    {
+      "id": "backend/matching/serializers.py:MatchingRequestReassignmentLogSerializer",
+      "label": "MatchingRequestReassignmentLogSerializer",
+      "file": "backend/matching/serializers.py",
+      "line": 134,
+      "type": "event",
+      "trace": null
+    },
+    {
+      "id": "backend/matching/serializers.py:ReassignRequestSerializer",
+      "label": "ReassignRequestSerializer",
+      "file": "backend/matching/serializers.py",
+      "line": 154,
+      "type": "event",
+      "trace": "Input serializer for the reassign endpoint."
+    },
+    {
+      "id": "backend/matching/serializers.py:ConfirmReturnSerializer",
+      "label": "ConfirmReturnSerializer",
+      "file": "backend/matching/serializers.py",
+      "line": 172,
+      "type": "event",
+      "trace": "Input serializer for confirming return of a batch line item."
+    },
+    {
+      "id": "backend/matching/serializers.py:MatchingRequestPhotoSerializer",
+      "label": "MatchingRequestPhotoSerializer",
+      "file": "backend/matching/serializers.py",
+      "line": 180,
+      "type": "event",
+      "trace": null
+    },
+    {
+      "id": "backend/matching/views.py:MatchingBatchViewSet",
+      "label": "MatchingBatchViewSet",
+      "file": "backend/matching/views.py",
+      "line": 180,
+      "type": "event",
+      "trace": null
+    },
+    {
+      "id": "backend/matching/views.py:MatchingBatchViewSet.get_queryset",
+      "label": "MatchingBatchViewSet.get_queryset",
+      "file": "backend/matching/views.py",
+      "line": 186,
+      "type": "function",
+      "trace": null
+    },
+    {
+      "id": "backend/matching/views.py:MatchingBatchViewSet.get_serializer_class",
+      "label": "MatchingBatchViewSet.get_serializer_class",
+      "file": "backend/matching/views.py",
+      "line": 194,
+      "type": "function",
+      "trace": null
+    },
+    {
+      "id": "backend/matching/views.py:MatchingBatchViewSet.perform_create",
+      "label": "MatchingBatchViewSet.perform_create",
+      "file": "backend/matching/views.py",
+      "line": 197,
+      "type": "function",
+      "trace": null
+    },
+    {
+      "id": "backend/matching/views.py:MatchingBatchViewSet.destroy",
+      "label": "MatchingBatchViewSet.destroy",
+      "file": "backend/matching/views.py",
+      "line": 200,
+      "type": "function",
+      "trace": null
+    },
+    {
+      "id": "backend/matching/views.py:MatchingBatchLineViewSet",
+      "label": "MatchingBatchLineViewSet",
+      "file": "backend/matching/views.py",
+      "line": 279,
+      "type": "event",
+      "trace": null
+    },
+    {
+      "id": "backend/matching/views.py:MatchingBatchLineViewSet.get_queryset",
+      "label": "MatchingBatchLineViewSet.get_queryset",
+      "file": "backend/matching/views.py",
+      "line": 283,
+      "type": "function",
+      "trace": null
+    },
+    {
+      "id": "backend/matching/views.py:PublicPhotoUploadView",
+      "label": "PublicPhotoUploadView",
+      "file": "backend/matching/views.py",
+      "line": 330,
+      "type": "event",
+      "trace": null
+    },
+    {
+      "id": "backend/matching/views.py:PublicPhotoUploadView.get",
+      "label": "PublicPhotoUploadView.get",
+      "file": "backend/matching/views.py",
+      "line": 332,
+      "type": "function",
+      "trace": null
+    },
+    {
+      "id": "backend/matching/views.py:PublicPhotoUploadView.post",
+      "label": "PublicPhotoUploadView.post",
+      "file": "backend/matching/views.py",
+      "line": 341,
+      "type": "function",
+      "trace": null
+    }
+  ],
+  "edges": [
+    {
+      "from": "backend/matching/views.py:MatchingRequestViewSet",
+      "to": "backend/matching/views.py:MatchingRequestViewSet.get_queryset"
+    },
+    {
+      "from": "backend/matching/views.py:MatchingRequestViewSet",
+      "to": "backend/matching/views.py:MatchingRequestViewSet.get_serializer_class"
+    },
+    {
+      "from": "backend/matching/views.py:MatchingRequestViewSet",
+      "to": "backend/matching/views.py:MatchingRequestViewSet.perform_create"
+    },
+    {
+      "from": "backend/matching/views.py:MatchingRequestViewSet",
+      "to": "backend/matching/views.py:MatchingRequestViewSet.perform_update"
+    },
+    {
+      "from": "backend/matching/views.py:MatchingBatchViewSet",
+      "to": "backend/matching/views.py:MatchingBatchViewSet.get_queryset"
+    },
+    {
+      "from": "backend/matching/views.py:MatchingBatchViewSet",
+      "to": "backend/matching/views.py:MatchingBatchViewSet.get_serializer_class"
+    },
+    {
+      "from": "backend/matching/views.py:MatchingBatchViewSet",
+      "to": "backend/matching/views.py:MatchingBatchViewSet.perform_create"
+    },
+    {
+      "from": "backend/matching/views.py:MatchingBatchViewSet",
+      "to": "backend/matching/views.py:MatchingBatchViewSet.destroy"
+    },
+    {
+      "from": "backend/matching/views.py:MatchingBatchLineViewSet",
+      "to": "backend/matching/views.py:MatchingBatchLineViewSet.get_queryset"
+    },
+    {
+      "from": "backend/matching/views.py:PublicPhotoUploadView",
+      "to": "backend/matching/views.py:PublicPhotoUploadView.get"
+    },
+    {
+      "from": "backend/matching/views.py:PublicPhotoUploadView",
+      "to": "backend/matching/views.py:PublicPhotoUploadView.post"
+    }
+  ]
+}

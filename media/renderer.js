@@ -1,387 +1,383 @@
 (function () {
-    console.log('renderer.js loaded');
-
     const vscode = acquireVsCodeApi();
-
     vscode.postMessage({ command: 'ready' });
 
-    // ── Diagram picker ────────────────────────────────────────────────────────
-
-    const picker = document.getElementById('diagramPicker');
-    picker.addEventListener('change', function () {
-        const selected = picker.options[picker.selectedIndex];
-        flipOverride = null;  // reset flip when switching diagrams
-        vscode.postMessage({ command: 'loadDiagramFile', file: selected.dataset.file });
-    });
-
-    let flipOverride = null;  // null = use diagram default, 'horizontal' or 'vertical' = override
-    let lastDiagram  = null;  // store last loaded diagram for re-render on flip
-
-    const flipBtn = document.getElementById('flipBtn');
-    flipBtn.addEventListener('click', function () {
-        if (!lastDiagram) { return; }
-        const current = flipOverride !== null ? flipOverride : (lastDiagram.layout || 'vertical');
-        flipOverride  = current === 'horizontal' ? 'vertical' : 'horizontal';
-        flipBtn.textContent = flipOverride === 'horizontal' ? '↕ Vertical' : '↔ Horizontal';
-        document.getElementById('diagramTitle').textContent = lastDiagram.title || '';
-        clearSvg();
-        renderDiagram(Object.assign({}, lastDiagram, { layout: flipOverride }));
-    });
+    // ── State ─────────────────────────────────────────────────────────────────
+    let allDiagrams = {};   // id -> diagram data
+    let manifest    = null;
+    let view        = 'home';   // 'home' | 'diagram' | 'class'
+    let currentDiagram = null;
+    let currentClass   = null;
 
     // ── Message handler ───────────────────────────────────────────────────────
-
     window.addEventListener('message', function(event) {
-        const message = event.data;
-        if (message.command === 'loadManifest') { populatePicker(message.data); }
-        if (message.command === 'loadDiagram')  {
-            lastDiagram = message.data;
-            flipOverride = null;
-            flipBtn.textContent = (message.data.layout === 'horizontal') ? '↕ Vertical' : '↔ Horizontal';
-            document.getElementById('diagramTitle').textContent = message.data.title || '';
-            clearSvg();
-            renderDiagram(message.data);
+        const msg = event.data;
+        if (msg.command === 'loadManifest') {
+            manifest = msg.data;
+            renderHome();
+        }
+        if (msg.command === 'loadDiagram') {
+            allDiagrams[msg.data.id] = msg.data;
+            if (view === 'home') { renderHome(); }
+        }
+        if (msg.command === 'loadAllDiagrams') {
+            msg.data.forEach(function(d) { allDiagrams[d.id] = d; });
+            renderHome();
         }
     });
 
-    function populatePicker(manifest) {
-        picker.innerHTML = '';
-        manifest.diagrams.forEach(function(d) {
-            const opt = document.createElement('option');
-            opt.value = d.id;
-            opt.textContent = d.title;
-            opt.dataset.file = d.file;
-            picker.appendChild(opt);
+    // ── Router ────────────────────────────────────────────────────────────────
+    function navigate(newView, diagram, cls) {
+        view           = newView;
+        currentDiagram = diagram || null;
+        currentClass   = cls    || null;
+        render();
+    }
+
+    function render() {
+        if (view === 'home')    { renderHome(); }
+        if (view === 'diagram') { renderDiagram(); }
+        if (view === 'class')   { renderClass(); }
+    }
+
+    // ── Home — diagram cards ──────────────────────────────────────────────────
+    function renderHome() {
+        if (!manifest) { return; }
+        const app = document.getElementById('app');
+        app.innerHTML = '';
+
+        const search = el('input', { type:'text', placeholder:'Search diagrams...', id:'search' });
+        search.addEventListener('input', function() { renderHome(); });
+        app.appendChild(search);
+
+        const grid = el('div', {}, 'grid');
+        const q = (document.getElementById('search') || search).value.toLowerCase();
+
+        manifest.diagrams.forEach(function(entry) {
+            const data = allDiagrams[entry.id];
+            if (q && !entry.title.toLowerCase().includes(q)) { return; }
+
+            const card = el('div', {}, 'card');
+            card.innerHTML =
+                '<div class="card-title">' + esc(entry.title) + '</div>' +
+                '<div class="card-meta">' + (data ? data.nodes.length + ' nodes' : 'loading…') + '</div>';
+
+            if (data) {
+                // Show class list for auto diagrams
+                const isAuto = data.id && data.id.startsWith('auto-');
+                if (isAuto) {
+                    const classes = data.nodes.filter(function(n) { return n.type === 'event'; });
+                    classes.forEach(function(cls) {
+                        const chip = el('div', {}, 'chip');
+                        chip.textContent = cls.label;
+                        chip.addEventListener('click', function(e) {
+                            e.stopPropagation();
+                            navigate('class', data, cls);
+                        });
+                        card.appendChild(chip);
+                    });
+                }
+            }
+
+            card.addEventListener('click', function() {
+                if (data) { navigate('diagram', data, null); }
+                else {
+                    vscode.postMessage({ command: 'loadDiagramFile', file: entry.file });
+                    // Wait for loadDiagram message, then navigate
+                    const waiter = function(event) {
+                        if (event.data.command === 'loadDiagram' && event.data.data.id === entry.id) {
+                            window.removeEventListener('message', waiter);
+                            navigate('diagram', event.data.data, null);
+                        }
+                    };
+                    window.addEventListener('message', waiter);
+                }
+            });
+            grid.appendChild(card);
         });
+
+        app.appendChild(grid);
     }
 
-    function clearSvg() {
-        const svgEl = document.getElementById('diagram');
-        while (svgEl.firstChild) { svgEl.removeChild(svgEl.firstChild); }
+    // ── Diagram view — class cards ────────────────────────────────────────────
+    function renderDiagram() {
+        const data   = currentDiagram;
+        const isAuto = data.id && data.id.startsWith('auto-');
+        const app    = document.getElementById('app');
+        app.innerHTML = '';
+
+        app.appendChild(breadcrumb([
+            { label: 'Home', action: function() { navigate('home'); } },
+            { label: data.title },
+        ]));
+
+        if (isAuto) {
+            // Card per class
+            const classes = data.nodes.filter(function(n) { return n.type === 'event'; });
+            const grid = el('div', {}, 'grid');
+            classes.forEach(function(cls) {
+                const methods = getClassMethods(data, cls);
+                const card = el('div', {}, 'card');
+                card.innerHTML =
+                    '<div class="card-title">' + esc(cls.label) + '</div>' +
+                    '<div class="card-meta">' + cls.file + ':' + cls.line + '</div>' +
+                    '<div class="card-meta">' + methods.length + ' methods</div>';
+
+                methods.forEach(function(m) {
+                    const chip = el('div', {}, 'chip method-chip');
+                    chip.textContent = m.label.split('.').pop();
+                    if (m.trace) { chip.title = m.trace; chip.classList.add('has-trace'); }
+                    chip.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        vscode.postMessage({ command: 'openFile', file: m.file, line: m.line });
+                    });
+                    card.appendChild(chip);
+                });
+
+                card.addEventListener('click', function() { navigate('class', data, cls); });
+                grid.appendChild(card);
+            });
+            app.appendChild(grid);
+        } else {
+            // Hand-authored diagram — show SVG
+            app.appendChild(renderSvg(data));
+        }
     }
 
-    // ── Tooltip ───────────────────────────────────────────────────────────────
+    // ── Class view — focused SVG + method list ────────────────────────────────
+    function renderClass() {
+        const data    = currentDiagram;
+        const cls     = currentClass;
+        const methods = getClassMethods(data, cls);
+        const app     = document.getElementById('app');
+        app.innerHTML = '';
 
-    const tooltip = document.createElement('div');
-    tooltip.style.cssText = [
-        'position:fixed','background:#252526','border:1px solid #4a9eff',
-        'border-radius:6px','padding:8px 12px','font-size:12px','color:#ccc',
-        'max-width:280px','line-height:1.5','pointer-events:none','opacity:0',
-        'transition:opacity 0.15s','z-index:999','box-shadow:0 4px 12px rgba(0,0,0,0.4)',
-    ].join(';');
-    document.body.appendChild(tooltip);
+        app.appendChild(breadcrumb([
+            { label: 'Home',      action: function() { navigate('home'); } },
+            { label: data.title,  action: function() { navigate('diagram', data); } },
+            { label: cls.label },
+        ]));
 
-    function showTooltip(e, node) {
-        if (!node.trace) { return; }
-        tooltip.innerHTML =
-            '<div style="color:#4a9eff;font-weight:600;margin-bottom:4px">' + escHtml(node.label.replace(/\n/g, ' ')) + '</div>' +
-            '<div>' + escHtml(node.trace) + '</div>' +
-            '<div style="margin-top:6px;color:#666;font-size:11px">' + escHtml(node.file) + ':' + node.line + '</div>';
-        tooltip.style.opacity = '1';
-        moveTooltip(e);
+        // Class header
+        const header = el('div', {}, 'class-header');
+        header.innerHTML =
+            '<div class="class-name">' + esc(cls.label) + '</div>' +
+            '<div class="class-file" data-file="' + esc(cls.file) + '" data-line="' + cls.line + '">' +
+            esc(cls.file) + ':' + cls.line + '</div>';
+        header.querySelector('.class-file').addEventListener('click', function() {
+            vscode.postMessage({ command: 'openFile', file: cls.file, line: cls.line });
+        });
+        if (cls.trace) {
+            const trace = el('div', {}, 'class-trace');
+            trace.textContent = cls.trace;
+            header.appendChild(trace);
+        }
+        app.appendChild(header);
+
+        // Method list
+        const list = el('div', {}, 'method-list');
+        methods.forEach(function(m) {
+            const row = el('div', {}, 'method-row');
+            const nameEl = el('div', {}, 'method-name');
+            nameEl.textContent = m.label.split('.').pop();
+            const fileEl = el('div', {}, 'method-file');
+            fileEl.textContent = m.file + ':' + m.line;
+            const traceEl = el('div', {}, 'method-trace');
+            traceEl.textContent = m.trace || '—';
+
+            row.appendChild(nameEl);
+            row.appendChild(fileEl);
+            row.appendChild(traceEl);
+            row.addEventListener('click', function() {
+                vscode.postMessage({ command: 'openFile', file: m.file, line: m.line });
+            });
+            list.appendChild(row);
+        });
+        app.appendChild(list);
+
+        // Mini SVG showing just this class + methods
+        const miniData = {
+            id: 'mini', title: cls.label, layout: 'vertical',
+            nodes: [cls].concat(methods),
+            edges: methods.map(function(m) { return { from: cls.id, to: m.id }; }),
+        };
+        const svgWrap = el('div', {}, 'svg-wrap');
+        svgWrap.appendChild(renderSvg(miniData));
+        app.appendChild(svgWrap);
     }
-    function moveTooltip(e) {
-        tooltip.style.left = (e.clientX + 14) + 'px';
-        tooltip.style.top  = (e.clientY - 10) + 'px';
-    }
-    function hideTooltip() { tooltip.style.opacity = '0'; }
-    function escHtml(str) {
-        return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+    // ── Helpers ───────────────────────────────────────────────────────────────
+
+    function getClassMethods(data, cls) {
+        const childIds = new Set(
+            data.edges
+                .filter(function(e) { return e.from === cls.id; })
+                .map(function(e) { return e.to; })
+        );
+        return data.nodes.filter(function(n) { return childIds.has(n.id); });
     }
 
-    // ── Layout ────────────────────────────────────────────────────────────────
-    // Assigns {x, y, col} to each node via BFS from root(s).
-    // Decision nodes fan their children into separate columns.
+    function breadcrumb(items) {
+        const bc = el('div', {}, 'breadcrumb');
+        items.forEach(function(item, i) {
+            if (i > 0) { const sep = el('span'); sep.textContent = ' › '; bc.appendChild(sep); }
+            if (item.action) {
+                const a = el('a', { href:'#' });
+                a.textContent = item.label;
+                a.addEventListener('click', function(e) { e.preventDefault(); item.action(); });
+                bc.appendChild(a);
+            } else {
+                const span = el('span', {}, 'bc-current');
+                span.textContent = item.label;
+                bc.appendChild(span);
+            }
+        });
+        return bc;
+    }
 
-    function computeLayout(data, NODE_W, ROW_H) {
-        const COL_GAP = NODE_W + 40;
+    function el(tag, attrs, cls) {
+        const e = document.createElement(tag);
+        if (attrs) { Object.keys(attrs).forEach(function(k) { e.setAttribute(k, attrs[k]); }); }
+        if (cls)   { e.className = cls; }
+        return e;
+    }
+
+    function esc(str) {
+        return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    // ── SVG renderer (for hand-authored + mini class diagrams) ────────────────
+    function renderSvg(data) {
+        const SVG_NS = 'http://www.w3.org/2000/svg';
+        const NODE_W = 200, NODE_H = 44, ROW_H = 100, COL_GAP = 240;
         const CENTRE_X = 300;
+        const TRACE_RING = '#9b6dff';
+        const COLOURS = {
+            event:    { fill: '#1a3a5c', stroke: '#4a9eff' },
+            function: { fill: '#2d5a2d', stroke: '#4aff6f' },
+            decision: { fill: '#5a3a1a', stroke: '#ffaa4a' },
+        };
 
-        // Build adjacency
-        const children = {};  // id -> [{id, label}]
-        const parents  = {};  // id -> count
+        // BFS layout
+        const children = {}, parents = {};
         data.nodes.forEach(function(n) { children[n.id] = []; parents[n.id] = 0; });
         data.edges.forEach(function(e) {
-            children[e.from].push({ id: e.to, label: e.label || '' });
-            parents[e.to]++;
+            if (children[e.from]) { children[e.from].push(e); }
+            if (parents[e.to] !== undefined) { parents[e.to]++; }
         });
-
-        // Find roots (no parents)
-        const roots = data.nodes.filter(function(n) { return parents[n.id] === 0; }).map(function(n){ return n.id; });
-
-        const nodeMap = {};
-        data.nodes.forEach(function(n) { nodeMap[n.id] = n; });
-
-        const pos   = {};  // id -> {x, y}
-        const depth = {};  // id -> row index
-        const col   = {};  // id -> column offset (integer, 0 = centre)
-
-        // BFS to assign depth and column
-        const queue = [];
-        roots.forEach(function(id) {
-            depth[id] = 0;
-            col[id]   = 0;
-            queue.push(id);
-        });
-
+        const roots = data.nodes.filter(function(n) { return parents[n.id] === 0; });
+        const depth = {}, col = {}, queue = [];
+        const horizontal = data.layout === 'horizontal';
+        roots.forEach(function(n, i) { depth[n.id] = 0; col[n.id] = i * 2; queue.push(n.id); });
         const visited = new Set();
         while (queue.length) {
             const id = queue.shift();
             if (visited.has(id)) { continue; }
             visited.add(id);
-
-            const ch = children[id];
-            const node = nodeMap[id];
-
-            if (ch.length >= 2) {
-                // Fan children symmetrically around parent column
-                const parentCol = col[id] || 0;
-                const half = (ch.length - 1) / 2;
-                ch.forEach(function(c, i) {
-                    if (col[c.id] === undefined) {
-                        col[c.id] = parentCol + (i - half);
-                    }
-                    if (depth[c.id] === undefined) {
-                        depth[c.id] = (depth[id] || 0) + 1;
-                    }
-                    queue.push(c.id);
-                });
-            } else {
-                ch.forEach(function(c) {
-                    if (depth[c.id] === undefined) {
-                        col[c.id]   = col[id] || 0;
-                        depth[c.id] = (depth[id] || 0) + 1;
-                    }
-                    queue.push(c.id);
-                });
-            }
+            const ch = children[id] || [];
+            const half = (ch.length-1)/2;
+            ch.forEach(function(e, i) {
+                if (depth[e.to] === undefined) {
+                    col[e.to]   = (col[id]||0) + (ch.length>1 ? i-half : 0);
+                    depth[e.to] = (depth[id]||0) + 1;
+                }
+                queue.push(e.to);
+            });
         }
+        data.nodes.forEach(function(n) { if (depth[n.id]===undefined) { depth[n.id]=0; col[n.id]=0; } });
 
-        // Any unvisited nodes (disconnected) get stacked at the bottom
-        let maxDepth = 0;
+        const pos = {};
+        const HORIZ_X = 60, HORIZ_Y = 300;
         data.nodes.forEach(function(n) {
-            if (depth[n.id] !== undefined) { maxDepth = Math.max(maxDepth, depth[n.id]); }
-        });
-        data.nodes.forEach(function(n) {
-            if (depth[n.id] === undefined) { depth[n.id] = ++maxDepth; col[n.id] = 0; }
-        });
-
-        // Convert depth+col to pixel positions
-        const horizontal = data.layout === 'horizontal';
-        const HORIZ_START_X = 100;  // left margin for horizontal diagrams
-        const HORIZ_CENTRE_Y = 300; // vertical centre for horizontal diagrams
-        data.nodes.forEach(function(n) {
-            if (horizontal) {
-                pos[n.id] = {
-                    x: HORIZ_START_X + depth[n.id] * ROW_H,
-                    y: HORIZ_CENTRE_Y + (col[n.id] || 0) * COL_GAP,
-                };
-            } else {
-                pos[n.id] = {
-                    x: CENTRE_X + (col[n.id] || 0) * COL_GAP,
-                    y: 40 + depth[n.id] * ROW_H,
-                };
-            }
+            pos[n.id] = horizontal
+                ? { x: HORIZ_X + (depth[n.id]||0)*ROW_H, y: HORIZ_Y + (col[n.id]||0)*COL_GAP }
+                : { x: CENTRE_X + (col[n.id]||0)*COL_GAP, y: 40 + (depth[n.id]||0)*ROW_H };
         });
 
-        // Canvas size
-        const allX = Object.values(pos).map(function(p){ return p.x; });
-        const allY = Object.values(pos).map(function(p){ return p.y; });
-        const minX = Math.min.apply(null, allX);
-        const minY = Math.min.apply(null, allY);
-        const maxX = Math.max.apply(null, allX);
-        const maxY = Math.max.apply(null, allY);
+        const allX = data.nodes.map(function(n){return pos[n.id].x;});
+        const allY = data.nodes.map(function(n){return pos[n.id].y;});
+        const minX = Math.min.apply(null,allX), minY = Math.min.apply(null,allY);
+        const maxX = Math.max.apply(null,allX), maxY = Math.max.apply(null,allY);
+        const shiftX = minX < NODE_W/2+20 ? NODE_W/2+20-minX : 0;
+        const shiftY = minY < NODE_H/2+20 ? NODE_H/2+20-minY : 0;
+        data.nodes.forEach(function(n) { pos[n.id].x += shiftX; pos[n.id].y += shiftY; });
 
-        return {
-            pos:        pos,
-            horizontal: horizontal,
-            width:      horizontal ? maxX + ROW_H        : Math.max(600, maxX - minX + NODE_W + 80),
-            height:     horizontal ? Math.max(600, maxY - minY + NODE_W + 80) : maxY + ROW_H,
-            minX:       minX,
-            minY:       minY,
-        };
-    }
+        const W = horizontal ? maxX+ROW_H+shiftX : Math.max(600, maxX-minX+NODE_W+80+shiftX);
+        const H = horizontal ? Math.max(400, maxY-minY+NODE_W+80+shiftY) : maxY+ROW_H+shiftY+60;
 
-    // ── Renderer ──────────────────────────────────────────────────────────────
+        const svg = document.createElementNS(SVG_NS, 'svg');
+        svg.setAttribute('viewBox', '0 0 '+W+' '+H);
+        svg.setAttribute('width', '100%');
+        svg.setAttribute('height', H);
+        svg.style.maxHeight = '400px';
 
-    function renderDiagram(data) {
-        const SVG_NS    = 'http://www.w3.org/2000/svg';
-        const horizontal = data.layout === 'horizontal';
-        const NODE_W    = horizontal ? 160 : 180;
-        const NODE_H    = horizontal ? 36  : 44;
-        const ROW_H     = horizontal ? 180 : 100;
-        const TRACE_RING = '#9b6dff';
-
-        const COLOURS = {
-            event:    { fill: '#1a3a5c', stroke: '#4a9eff' },
-            function: { fill: '#2d5a2d', stroke: '#4aff6f' },
-            decision: { fill: '#5a3a1a', stroke: '#ffaa4a' }
-        };
-
-        const layout = computeLayout(data, NODE_W, ROW_H);
-        const positions = layout.pos;
-
-        // Shift so nothing is clipped
-        const shiftX = layout.minX < NODE_W / 2 + 20 ? (NODE_W / 2 + 20 - layout.minX) : 0;
-        const shiftY = layout.horizontal && layout.minY < NODE_W / 2 + 20 ? (NODE_W / 2 + 20 - layout.minY) : 0;
-        Object.keys(positions).forEach(function(id) {
-            positions[id].x += shiftX;
-            positions[id].y += shiftY;
-        });
-
-        const svgEl = document.getElementById('diagram');
-        const totalW = layout.width  + shiftX;
-        const totalH = layout.height + shiftY + (layout.horizontal ? 0 : 60);
-        svgEl.setAttribute('viewBox', '0 0 ' + totalW + ' ' + totalH);
-        svgEl.setAttribute('height', totalH);
-
-        function el(tag, attrs) {
-            attrs = attrs || {};
+        function svgEl(tag, attrs) {
             const e = document.createElementNS(SVG_NS, tag);
-            Object.keys(attrs).forEach(function(k) { e.setAttribute(k, attrs[k]); });
+            Object.keys(attrs||{}).forEach(function(k){e.setAttribute(k,attrs[k]);});
             return e;
         }
 
-        // Arrow marker
-        const defs = el('defs');
-        const marker = el('marker', {
-            id: 'arrow', markerWidth: '10', markerHeight: '7',
-            refX: '10', refY: '3.5', orient: 'auto'
-        });
-        marker.appendChild(el('polygon', { points: '0 0, 10 3.5, 0 7', fill: '#888' }));
-        defs.appendChild(marker);
-        svgEl.appendChild(defs);
+        const defs = svgEl('defs');
+        const mk = svgEl('marker', {id:'arrow2',markerWidth:'10',markerHeight:'7',refX:'10',refY:'3.5',orient:'auto'});
+        mk.appendChild(svgEl('polygon',{points:'0 0, 10 3.5, 0 7',fill:'#888'}));
+        defs.appendChild(mk); svg.appendChild(defs);
 
-        // ── Edges ─────────────────────────────────────────────────────────────
         data.edges.forEach(function(edge) {
-            const from = positions[edge.from];
-            const to   = positions[edge.to];
-            if (!from || !to) { return; }
-
-            const x1 = horizontal ? from.x + NODE_W / 2 : from.x;
-            const y1 = horizontal ? from.y               : from.y + NODE_H / 2;
-            const x2 = horizontal ? to.x   - NODE_W / 2 : to.x;
-            const y2 = horizontal ? to.y                 : to.y   - NODE_H / 2;
-
-            let pathEl;
-            if (x1 === x2) {
-                // Straight vertical line
-                pathEl = el('line', {
-                    x1: x1, y1: y1, x2: x2, y2: y2,
-                    stroke: '#555', 'stroke-width': '2', 'marker-end': 'url(#arrow)'
-                });
+            const f = pos[edge.from], t = pos[edge.to];
+            if (!f||!t) { return; }
+            const x1=horizontal?f.x+NODE_W/2:f.x, y1=horizontal?f.y:f.y+NODE_H/2;
+            const x2=horizontal?t.x-NODE_W/2:t.x, y2=horizontal?t.y:t.y-NODE_H/2;
+            let pe;
+            if (Math.abs(x1-x2)<2) {
+                pe = svgEl('line',{x1:x1,y1:y1,x2:x2,y2:y2,stroke:'#555','stroke-width':'2','marker-end':'url(#arrow2)'});
             } else {
-                // Bezier curve for diagonal connections
-                const cy1 = y1 + (y2 - y1) * 0.4;
-                const cy2 = y1 + (y2 - y1) * 0.6;
-                pathEl = el('path', {
-                    d: 'M'+x1+','+y1+' C'+x1+','+cy1+' '+x2+','+cy2+' '+x2+','+y2,
-                    fill: 'none', stroke: '#555', 'stroke-width': '2', 'marker-end': 'url(#arrow)'
-                });
+                const cy1=y1+(y2-y1)*0.4, cy2=y1+(y2-y1)*0.6;
+                pe = svgEl('path',{d:'M'+x1+','+y1+' C'+x1+','+cy1+' '+x2+','+cy2+' '+x2+','+y2,fill:'none',stroke:'#555','stroke-width':'2','marker-end':'url(#arrow2)'});
             }
-            svgEl.appendChild(pathEl);
-
+            svg.appendChild(pe);
             if (edge.label) {
-                const mx = (x1 + x2) / 2;
-                const my = (y1 + y2) / 2;
-                const bg = el('rect', {
-                    x: mx - 18, y: my - 10, width: 36, height: 18, rx: '3',
-                    fill: '#1e1e1e', opacity: '0.85'
-                });
-                const t = el('text', {
-                    x: mx, y: my + 1,
-                    fill: '#ffaa4a', 'font-size': '11',
-                    'text-anchor': 'middle', 'dominant-baseline': 'middle'
-                });
-                t.textContent = edge.label;
-                svgEl.appendChild(bg);
-                svgEl.appendChild(t);
+                const mx=(x1+x2)/2, my=(y1+y2)/2;
+                svg.appendChild(svgEl('rect',{x:mx-18,y:my-10,width:36,height:18,rx:'3',fill:'#1e1e1e',opacity:'0.85'}));
+                const t2=svgEl('text',{x:mx,y:my+1,fill:'#ffaa4a','font-size':'11','text-anchor':'middle','dominant-baseline':'middle'});
+                t2.textContent=edge.label; svg.appendChild(t2);
             }
         });
 
-        // ── Nodes ─────────────────────────────────────────────────────────────
         data.nodes.forEach(function(node) {
-            const pos = positions[node.id];
-            const cx  = pos.x;
-            const cy  = pos.y;
-            const col = COLOURS[node.type] || COLOURS.function;
-            const hasTrace = !!node.trace;
-
-            const g = el('g');
-            g.style.cursor = 'pointer';
-            g.addEventListener('click', function() {
-                vscode.postMessage({ command: 'openFile', file: node.file, line: node.line });
+            const p=pos[node.id]; if(!p){return;}
+            const cx=p.x, cy=p.y;
+            const c=COLOURS[node.type]||COLOURS.function;
+            const g=svgEl('g'); g.style.cursor='pointer';
+            g.addEventListener('click',function(){
+                vscode.postMessage({command:'openFile',file:node.file,line:node.line});
             });
-            g.addEventListener('mouseenter', function(e) { showTooltip(e, node); });
-            g.addEventListener('mousemove',  function(e) { moveTooltip(e); });
-            g.addEventListener('mouseleave', hideTooltip);
+            const tooltip_text = (node.trace||'') + '\n' + node.file+':'+node.line;
+            const title=svgEl('title'); title.textContent=tooltip_text; g.appendChild(title);
 
-            // Trace ring
-            if (hasTrace) {
-                if (node.type === 'decision') {
-                    const hw = NODE_W / 2 + 4, hh = NODE_H / 2 + 10;
-                    g.appendChild(el('polygon', {
-                        points: cx+','+(cy-hh)+' '+(cx+hw)+','+cy+' '+cx+','+(cy+hh)+' '+(cx-hw)+','+cy,
-                        fill: 'none', stroke: TRACE_RING, 'stroke-width': '1', opacity: '0.5'
-                    }));
-                } else {
-                    g.appendChild(el('rect', {
-                        x: cx-NODE_W/2-3, y: cy-NODE_H/2-3,
-                        width: NODE_W+6, height: NODE_H+6,
-                        rx: node.type === 'event' ? NODE_H/2+3 : '6',
-                        fill: 'none', stroke: TRACE_RING, 'stroke-width': '1', opacity: '0.5'
-                    }));
-                }
+            if (node.trace) {
+                g.appendChild(svgEl('rect',{x:cx-NODE_W/2-3,y:cy-NODE_H/2-3,width:NODE_W+6,height:NODE_H+6,rx:'6',fill:'none',stroke:TRACE_RING,'stroke-width':'1',opacity:'0.5'}));
             }
-
-            // Node shape
-            if (node.type === 'event') {
-                g.appendChild(el('rect', {
-                    x: cx-NODE_W/2, y: cy-NODE_H/2,
-                    width: NODE_W, height: NODE_H, rx: NODE_H/2,
-                    fill: col.fill, stroke: col.stroke, 'stroke-width': '2'
-                }));
-            } else if (node.type === 'decision') {
-                const hw = NODE_W/2, hh = NODE_H/2+6;
-                g.appendChild(el('polygon', {
-                    points: cx+','+(cy-hh)+' '+(cx+hw)+','+cy+' '+cx+','+(cy+hh)+' '+(cx-hw)+','+cy,
-                    fill: col.fill, stroke: col.stroke, 'stroke-width': '2'
-                }));
+            if (node.type==='event') {
+                g.appendChild(svgEl('rect',{x:cx-NODE_W/2,y:cy-NODE_H/2,width:NODE_W,height:NODE_H,rx:NODE_H/2,fill:c.fill,stroke:c.stroke,'stroke-width':'2'}));
+            } else if (node.type==='decision') {
+                const hw=NODE_W/2,hh=NODE_H/2+6;
+                g.appendChild(svgEl('polygon',{points:cx+','+(cy-hh)+' '+(cx+hw)+','+cy+' '+cx+','+(cy+hh)+' '+(cx-hw)+','+cy,fill:c.fill,stroke:c.stroke,'stroke-width':'2'}));
             } else {
-                g.appendChild(el('rect', {
-                    x: cx-NODE_W/2, y: cy-NODE_H/2,
-                    width: NODE_W, height: NODE_H, rx: '4',
-                    fill: col.fill, stroke: col.stroke, 'stroke-width': '2'
-                }));
+                g.appendChild(svgEl('rect',{x:cx-NODE_W/2,y:cy-NODE_H/2,width:NODE_W,height:NODE_H,rx:'4',fill:c.fill,stroke:c.stroke,'stroke-width':'2'}));
             }
-
-            // Label
-            const lines  = node.label.split('\n');
-            const lineH  = 14;
-            const startY = cy - ((lines.length - 1) * lineH) / 2;
-            lines.forEach(function(lineText, i) {
-                const t = el('text', {
-                    x: cx, y: startY + i * lineH,
-                    fill: '#fff', 'font-size': '12',
-                    'text-anchor': 'middle', 'dominant-baseline': 'middle'
-                });
-                t.textContent = lineText;
-                g.appendChild(t);
+            const MAX=Math.floor(NODE_W/7);
+            const lbl=(node.label.length>MAX?node.label.slice(0,MAX-1)+'…':node.label).split('\n');
+            const lh=14, sy=cy-((lbl.length-1)*lh)/2;
+            lbl.forEach(function(lt,i){
+                const t=svgEl('text',{x:cx,y:sy+i*lh,fill:'#fff','font-size':'11','text-anchor':'middle','dominant-baseline':'middle'});
+                t.textContent=lt; g.appendChild(t);
             });
-
-            // Trace dot
-            if (hasTrace) {
-                g.appendChild(el('circle', {
-                    cx: cx+NODE_W/2-6, cy: cy-NODE_H/2+6,
-                    r: '4', fill: TRACE_RING
-                }));
+            if (node.trace) {
+                g.appendChild(svgEl('circle',{cx:cx+NODE_W/2-6,cy:cy-NODE_H/2+6,r:'4',fill:TRACE_RING}));
             }
-
-            const title = el('title');
-            title.textContent = node.file + ':' + node.line;
-            g.appendChild(title);
-
-            svgEl.appendChild(g);
+            svg.appendChild(g);
         });
+        return svg;
     }
 
 }());

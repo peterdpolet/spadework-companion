@@ -1,0 +1,70 @@
+{
+  "id": "auto-accounts",
+  "title": "Accounts \u2014 Auto",
+  "layout": "vertical",
+  "auto": true,
+  "nodes": [
+    {
+      "id": "backend/accounts/serializers.py:UserCreateSerializer",
+      "label": "UserCreateSerializer",
+      "file": "backend/accounts/serializers.py",
+      "line": 16,
+      "type": "event",
+      "trace": "Extends Djoser's serializer to include name, role, company."
+    },
+    {
+      "id": "backend/accounts/serializers.py:UserCreateSerializer.create",
+      "label": "UserCreateSerializer.create",
+      "file": "backend/accounts/serializers.py",
+      "line": 24,
+      "type": "function",
+      "trace": null
+    },
+    {
+      "id": "backend/accounts/serializers.py:UserSerializer",
+      "label": "UserSerializer",
+      "file": "backend/accounts/serializers.py",
+      "line": 30,
+      "type": "event",
+      "trace": null
+    },
+    {
+      "id": "backend/accounts/serializers.py:LoginSerializer",
+      "label": "LoginSerializer",
+      "file": "backend/accounts/serializers.py",
+      "line": 40,
+      "type": "event",
+      "trace": null
+    },
+    {
+      "id": "backend/accounts/serializers.py:TOTPVerifySerializer",
+      "label": "TOTPVerifySerializer",
+      "file": "backend/accounts/serializers.py",
+      "line": 45,
+      "type": "event",
+      "trace": null
+    },
+    {
+      "id": "backend/accounts/serializers.py:TOTPSetupConfirmSerializer",
+      "label": "TOTPSetupConfirmSerializer",
+      "file": "backend/accounts/serializers.py",
+      "line": 49,
+      "type": "event",
+      "trace": null
+    },
+    {
+      "id": "backend/accounts/serializers.py:TOTPDisableSerializer",
+      "label": "TOTPDisableSerializer",
+      "file": "backend/accounts/serializers.py",
+      "line": 53,
+      "type": "event",
+      "trace": null
+    }
+  ],
+  "edges": [
+    {
+      "from": "backend/accounts/serializers.py:UserCreateSerializer",
+      "to": "backend/accounts/serializers.py:UserCreateSerializer.create"
+    }
+  ]
+}

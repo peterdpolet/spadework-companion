@@ -1,0 +1,290 @@
+{
+  "id": "auto-chat",
+  "title": "Chat \u2014 Auto",
+  "layout": "vertical",
+  "auto": true,
+  "nodes": [
+    {
+      "id": "backend/chat/serializers.py:UserSerializer",
+      "label": "UserSerializer",
+      "file": "backend/chat/serializers.py",
+      "line": 6,
+      "type": "event",
+      "trace": null
+    },
+    {
+      "id": "backend/chat/chat/serializers.py:UserSerializer",
+      "label": "UserSerializer",
+      "file": "backend/chat/chat/serializers.py",
+      "line": 6,
+      "type": "event",
+      "trace": null
+    },
+    {
+      "id": "backend/chat/consumers.py:ChatConsumer",
+      "label": "ChatConsumer",
+      "file": "backend/chat/consumers.py",
+      "line": 7,
+      "type": "event",
+      "trace": null
+    },
+    {
+      "id": "backend/chat/chat/consumers.py:ChatConsumer",
+      "label": "ChatConsumer",
+      "file": "backend/chat/chat/consumers.py",
+      "line": 7,
+      "type": "event",
+      "trace": null
+    },
+    {
+      "id": "backend/chat/views.py:RoomListView",
+      "label": "RoomListView",
+      "file": "backend/chat/views.py",
+      "line": 9,
+      "type": "event",
+      "trace": null
+    },
+    {
+      "id": "backend/chat/chat/views.py:RoomListView",
+      "label": "RoomListView",
+      "file": "backend/chat/chat/views.py",
+      "line": 9,
+      "type": "event",
+      "trace": null
+    },
+    {
+      "id": "backend/chat/consumers.py:ChatConsumer.connect",
+      "label": "ChatConsumer.connect",
+      "file": "backend/chat/consumers.py",
+      "line": 9,
+      "type": "function",
+      "trace": null
+    },
+    {
+      "id": "backend/chat/chat/consumers.py:ChatConsumer.connect",
+      "label": "ChatConsumer.connect",
+      "file": "backend/chat/chat/consumers.py",
+      "line": 9,
+      "type": "function",
+      "trace": null
+    },
+    {
+      "id": "backend/chat/serializers.py:MessageSerializer",
+      "label": "MessageSerializer",
+      "file": "backend/chat/serializers.py",
+      "line": 12,
+      "type": "event",
+      "trace": null
+    },
+    {
+      "id": "backend/chat/chat/serializers.py:MessageSerializer",
+      "label": "MessageSerializer",
+      "file": "backend/chat/chat/serializers.py",
+      "line": 12,
+      "type": "event",
+      "trace": null
+    },
+    {
+      "id": "backend/chat/views.py:RoomListView.get_queryset",
+      "label": "RoomListView.get_queryset",
+      "file": "backend/chat/views.py",
+      "line": 13,
+      "type": "function",
+      "trace": null
+    },
+    {
+      "id": "backend/chat/chat/views.py:RoomListView.get_queryset",
+      "label": "RoomListView.get_queryset",
+      "file": "backend/chat/chat/views.py",
+      "line": 13,
+      "type": "function",
+      "trace": null
+    },
+    {
+      "id": "backend/chat/serializers.py:RoomSerializer",
+      "label": "RoomSerializer",
+      "file": "backend/chat/serializers.py",
+      "line": 21,
+      "type": "event",
+      "trace": null
+    },
+    {
+      "id": "backend/chat/chat/serializers.py:RoomSerializer",
+      "label": "RoomSerializer",
+      "file": "backend/chat/chat/serializers.py",
+      "line": 21,
+      "type": "event",
+      "trace": null
+    },
+    {
+      "id": "backend/chat/views.py:RoomDetailView",
+      "label": "RoomDetailView",
+      "file": "backend/chat/views.py",
+      "line": 22,
+      "type": "event",
+      "trace": null
+    },
+    {
+      "id": "backend/chat/chat/views.py:RoomDetailView",
+      "label": "RoomDetailView",
+      "file": "backend/chat/chat/views.py",
+      "line": 22,
+      "type": "event",
+      "trace": null
+    },
+    {
+      "id": "backend/chat/views.py:RoomDetailView.get_queryset",
+      "label": "RoomDetailView.get_queryset",
+      "file": "backend/chat/views.py",
+      "line": 27,
+      "type": "function",
+      "trace": null
+    },
+    {
+      "id": "backend/chat/chat/views.py:RoomDetailView.get_queryset",
+      "label": "RoomDetailView.get_queryset",
+      "file": "backend/chat/chat/views.py",
+      "line": 27,
+      "type": "function",
+      "trace": null
+    },
+    {
+      "id": "backend/chat/consumers.py:ChatConsumer.disconnect",
+      "label": "ChatConsumer.disconnect",
+      "file": "backend/chat/consumers.py",
+      "line": 37,
+      "type": "function",
+      "trace": null
+    },
+    {
+      "id": "backend/chat/chat/consumers.py:ChatConsumer.disconnect",
+      "label": "ChatConsumer.disconnect",
+      "file": "backend/chat/chat/consumers.py",
+      "line": 37,
+      "type": "function",
+      "trace": null
+    },
+    {
+      "id": "backend/chat/views.py:MessageListView",
+      "label": "MessageListView",
+      "file": "backend/chat/views.py",
+      "line": 53,
+      "type": "event",
+      "trace": null
+    },
+    {
+      "id": "backend/chat/chat/views.py:MessageListView",
+      "label": "MessageListView",
+      "file": "backend/chat/chat/views.py",
+      "line": 53,
+      "type": "event",
+      "trace": null
+    },
+    {
+      "id": "backend/chat/consumers.py:ChatConsumer.receive",
+      "label": "ChatConsumer.receive",
+      "file": "backend/chat/consumers.py",
+      "line": 53,
+      "type": "function",
+      "trace": null
+    },
+    {
+      "id": "backend/chat/chat/consumers.py:ChatConsumer.receive",
+      "label": "ChatConsumer.receive",
+      "file": "backend/chat/chat/consumers.py",
+      "line": 53,
+      "type": "function",
+      "trace": null
+    },
+    {
+      "id": "backend/chat/views.py:MessageListView.get_queryset",
+      "label": "MessageListView.get_queryset",
+      "file": "backend/chat/views.py",
+      "line": 57,
+      "type": "function",
+      "trace": null
+    },
+    {
+      "id": "backend/chat/chat/views.py:MessageListView.get_queryset",
+      "label": "MessageListView.get_queryset",
+      "file": "backend/chat/chat/views.py",
+      "line": 57,
+      "type": "function",
+      "trace": null
+    },
+    {
+      "id": "backend/chat/views.py:MessageListView.list",
+      "label": "MessageListView.list",
+      "file": "backend/chat/views.py",
+      "line": 65,
+      "type": "function",
+      "trace": null
+    },
+    {
+      "id": "backend/chat/chat/views.py:MessageListView.list",
+      "label": "MessageListView.list",
+      "file": "backend/chat/chat/views.py",
+      "line": 65,
+      "type": "function",
+      "trace": null
+    }
+  ],
+  "edges": [
+    {
+      "from": "backend/chat/consumers.py:ChatConsumer",
+      "to": "backend/chat/consumers.py:ChatConsumer.connect"
+    },
+    {
+      "from": "backend/chat/consumers.py:ChatConsumer",
+      "to": "backend/chat/consumers.py:ChatConsumer.disconnect"
+    },
+    {
+      "from": "backend/chat/consumers.py:ChatConsumer",
+      "to": "backend/chat/consumers.py:ChatConsumer.receive"
+    },
+    {
+      "from": "backend/chat/views.py:RoomListView",
+      "to": "backend/chat/views.py:RoomListView.get_queryset"
+    },
+    {
+      "from": "backend/chat/views.py:RoomDetailView",
+      "to": "backend/chat/views.py:RoomDetailView.get_queryset"
+    },
+    {
+      "from": "backend/chat/views.py:MessageListView",
+      "to": "backend/chat/views.py:MessageListView.get_queryset"
+    },
+    {
+      "from": "backend/chat/views.py:MessageListView",
+      "to": "backend/chat/views.py:MessageListView.list"
+    },
+    {
+      "from": "backend/chat/chat/consumers.py:ChatConsumer",
+      "to": "backend/chat/chat/consumers.py:ChatConsumer.connect"
+    },
+    {
+      "from": "backend/chat/chat/consumers.py:ChatConsumer",
+      "to": "backend/chat/chat/consumers.py:ChatConsumer.disconnect"
+    },
+    {
+      "from": "backend/chat/chat/consumers.py:ChatConsumer",
+      "to": "backend/chat/chat/consumers.py:ChatConsumer.receive"
+    },
+    {
+      "from": "backend/chat/chat/views.py:RoomListView",
+      "to": "backend/chat/chat/views.py:RoomListView.get_queryset"
+    },
+    {
+      "from": "backend/chat/chat/views.py:RoomDetailView",
+      "to": "backend/chat/chat/views.py:RoomDetailView.get_queryset"
+    },
+    {
+      "from": "backend/chat/chat/views.py:MessageListView",
+      "to": "backend/chat/chat/views.py:MessageListView.get_queryset"
+    },
+    {
+      "from": "backend/chat/chat/views.py:MessageListView",
+      "to": "backend/chat/chat/views.py:MessageListView.list"
+    }
+  ]
+}

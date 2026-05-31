@@ -1,0 +1,30 @@
+{
+  "id": "auto-config",
+  "title": "Config \u2014 Auto",
+  "layout": "vertical",
+  "auto": true,
+  "nodes": [
+    {
+      "id": "backend/config/authentication.py:QueryParamJWTAuthentication",
+      "label": "QueryParamJWTAuthentication",
+      "file": "backend/config/authentication.py",
+      "line": 4,
+      "type": "event",
+      "trace": "Allows JWT to be passed as ?token= for browser-navigable endpoints like PDF downloads."
+    },
+    {
+      "id": "backend/config/authentication.py:QueryParamJWTAuthentication.authenticate",
+      "label": "QueryParamJWTAuthentication.authenticate",
+      "file": "backend/config/authentication.py",
+      "line": 6,
+      "type": "function",
+      "trace": null
+    }
+  ],
+  "edges": [
+    {
+      "from": "backend/config/authentication.py:QueryParamJWTAuthentication",
+      "to": "backend/config/authentication.py:QueryParamJWTAuthentication.authenticate"
+    }
+  ]
+}

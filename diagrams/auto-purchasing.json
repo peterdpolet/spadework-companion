@@ -1,0 +1,314 @@
+{
+  "id": "auto-purchasing",
+  "title": "Purchasing \u2014 Auto",
+  "layout": "vertical",
+  "auto": true,
+  "nodes": [
+    {
+      "id": "backend/purchasing/serializers/goods_receipt.py:GoodsReceiptLineSerializer",
+      "label": "GoodsReceiptLineSerializer",
+      "file": "backend/purchasing/serializers/goods_receipt.py",
+      "line": 5,
+      "type": "event",
+      "trace": null
+    },
+    {
+      "id": "backend/purchasing/serializers/invoice.py:InvoiceLineSerializer",
+      "label": "InvoiceLineSerializer",
+      "file": "backend/purchasing/serializers/invoice.py",
+      "line": 5,
+      "type": "event",
+      "trace": null
+    },
+    {
+      "id": "backend/purchasing/serializers/purchase_order.py:PurchaseOrderLineSerializer",
+      "label": "PurchaseOrderLineSerializer",
+      "file": "backend/purchasing/serializers/purchase_order.py",
+      "line": 5,
+      "type": "event",
+      "trace": null
+    },
+    {
+      "id": "backend/purchasing/serializers/quotes.py:SupplierQuoteSerializer",
+      "label": "SupplierQuoteSerializer",
+      "file": "backend/purchasing/serializers/quotes.py",
+      "line": 5,
+      "type": "event",
+      "trace": null
+    },
+    {
+      "id": "backend/purchasing/serializers/so_lines.py:OpenSOLineSerializer",
+      "label": "OpenSOLineSerializer",
+      "file": "backend/purchasing/serializers/so_lines.py",
+      "line": 5,
+      "type": "event",
+      "trace": null
+    },
+    {
+      "id": "backend/purchasing/views/items.py:ItemViewSet",
+      "label": "ItemViewSet",
+      "file": "backend/purchasing/views/items.py",
+      "line": 9,
+      "type": "event",
+      "trace": null
+    },
+    {
+      "id": "backend/purchasing/views/invoice.py:InvoiceViewSet",
+      "label": "InvoiceViewSet",
+      "file": "backend/purchasing/views/invoice.py",
+      "line": 10,
+      "type": "event",
+      "trace": null
+    },
+    {
+      "id": "backend/purchasing/views/quotes.py:SupplierQuoteViewSet",
+      "label": "SupplierQuoteViewSet",
+      "file": "backend/purchasing/views/quotes.py",
+      "line": 10,
+      "type": "event",
+      "trace": null
+    },
+    {
+      "id": "backend/purchasing/views/goods_receipt.py:GoodsReceiptViewSet",
+      "label": "GoodsReceiptViewSet",
+      "file": "backend/purchasing/views/goods_receipt.py",
+      "line": 13,
+      "type": "event",
+      "trace": null
+    },
+    {
+      "id": "backend/purchasing/views/pdf.py:PurchaseOrderPDFView",
+      "label": "PurchaseOrderPDFView",
+      "file": "backend/purchasing/views/pdf.py",
+      "line": 13,
+      "type": "event",
+      "trace": null
+    },
+    {
+      "id": "backend/purchasing/views/quotes.py:SupplierQuoteViewSet.get_queryset",
+      "label": "SupplierQuoteViewSet.get_queryset",
+      "file": "backend/purchasing/views/quotes.py",
+      "line": 14,
+      "type": "function",
+      "trace": null
+    },
+    {
+      "id": "backend/purchasing/views/items.py:ItemViewSet.get_queryset",
+      "label": "ItemViewSet.get_queryset",
+      "file": "backend/purchasing/views/items.py",
+      "line": 15,
+      "type": "function",
+      "trace": null
+    },
+    {
+      "id": "backend/purchasing/views/purchase_order.py:PurchaseOrderViewSet",
+      "label": "PurchaseOrderViewSet",
+      "file": "backend/purchasing/views/purchase_order.py",
+      "line": 16,
+      "type": "event",
+      "trace": null
+    },
+    {
+      "id": "backend/purchasing/views/invoice.py:InvoiceViewSet.get_queryset",
+      "label": "InvoiceViewSet.get_queryset",
+      "file": "backend/purchasing/views/invoice.py",
+      "line": 17,
+      "type": "function",
+      "trace": null
+    },
+    {
+      "id": "backend/purchasing/views/pdf.py:PurchaseOrderPDFView.get",
+      "label": "PurchaseOrderPDFView.get",
+      "file": "backend/purchasing/views/pdf.py",
+      "line": 17,
+      "type": "function",
+      "trace": null
+    },
+    {
+      "id": "backend/purchasing/views/goods_receipt.py:GoodsReceiptViewSet.get_queryset",
+      "label": "GoodsReceiptViewSet.get_queryset",
+      "file": "backend/purchasing/views/goods_receipt.py",
+      "line": 18,
+      "type": "function",
+      "trace": null
+    },
+    {
+      "id": "backend/purchasing/views/items.py:ItemViewSet.get_serializer_class",
+      "label": "ItemViewSet.get_serializer_class",
+      "file": "backend/purchasing/views/items.py",
+      "line": 18,
+      "type": "function",
+      "trace": null
+    },
+    {
+      "id": "backend/purchasing/views/items.py:ItemViewSet.perform_create",
+      "label": "ItemViewSet.perform_create",
+      "file": "backend/purchasing/views/items.py",
+      "line": 21,
+      "type": "function",
+      "trace": null
+    },
+    {
+      "id": "backend/purchasing/views/purchase_order.py:PurchaseOrderViewSet.get_queryset",
+      "label": "PurchaseOrderViewSet.get_queryset",
+      "file": "backend/purchasing/views/purchase_order.py",
+      "line": 23,
+      "type": "function",
+      "trace": null
+    },
+    {
+      "id": "backend/purchasing/views/goods_receipt.py:GoodsReceiptViewSet.get_serializer_class",
+      "label": "GoodsReceiptViewSet.get_serializer_class",
+      "file": "backend/purchasing/views/goods_receipt.py",
+      "line": 25,
+      "type": "function",
+      "trace": null
+    },
+    {
+      "id": "backend/purchasing/views/items.py:ItemViewSet.perform_destroy",
+      "label": "ItemViewSet.perform_destroy",
+      "file": "backend/purchasing/views/items.py",
+      "line": 26,
+      "type": "function",
+      "trace": null
+    },
+    {
+      "id": "backend/purchasing/serializers/goods_receipt.py:GoodsReceiptLineWriteSerializer",
+      "label": "GoodsReceiptLineWriteSerializer",
+      "file": "backend/purchasing/serializers/goods_receipt.py",
+      "line": 27,
+      "type": "event",
+      "trace": null
+    },
+    {
+      "id": "backend/purchasing/views/invoice.py:InvoiceViewSet.perform_create",
+      "label": "InvoiceViewSet.perform_create",
+      "file": "backend/purchasing/views/invoice.py",
+      "line": 27,
+      "type": "function",
+      "trace": null
+    },
+    {
+      "id": "backend/purchasing/serializers/purchase_order.py:PurchaseOrderLineWriteSerializer",
+      "label": "PurchaseOrderLineWriteSerializer",
+      "file": "backend/purchasing/serializers/purchase_order.py",
+      "line": 28,
+      "type": "event",
+      "trace": null
+    },
+    {
+      "id": "backend/purchasing/views/goods_receipt.py:GoodsReceiptViewSet.perform_create",
+      "label": "GoodsReceiptViewSet.perform_create",
+      "file": "backend/purchasing/views/goods_receipt.py",
+      "line": 28,
+      "type": "function",
+      "trace": null
+    },
+    {
+      "id": "backend/purchasing/views/purchase_order.py:PurchaseOrderViewSet.get_serializer_class",
+      "label": "PurchaseOrderViewSet.get_serializer_class",
+      "file": "backend/purchasing/views/purchase_order.py",
+      "line": 28,
+      "type": "function",
+      "trace": null
+    },
+    {
+      "id": "backend/purchasing/serializers/goods_receipt.py:GoodsReceiptSerializer",
+      "label": "GoodsReceiptSerializer",
+      "file": "backend/purchasing/serializers/goods_receipt.py",
+      "line": 33,
+      "type": "event",
+      "trace": null
+    },
+    {
+      "id": "backend/purchasing/views/purchase_order.py:PurchaseOrderViewSet.perform_create",
+      "label": "PurchaseOrderViewSet.perform_create",
+      "file": "backend/purchasing/views/purchase_order.py",
+      "line": 33,
+      "type": "function",
+      "trace": null
+    },
+    {
+      "id": "backend/purchasing/serializers/invoice.py:InvoiceSerializer",
+      "label": "InvoiceSerializer",
+      "file": "backend/purchasing/serializers/invoice.py",
+      "line": 39,
+      "type": "event",
+      "trace": null
+    },
+    {
+      "id": "backend/purchasing/serializers/purchase_order.py:PurchaseOrderSerializer",
+      "label": "PurchaseOrderSerializer",
+      "file": "backend/purchasing/serializers/purchase_order.py",
+      "line": 39,
+      "type": "event",
+      "trace": null
+    },
+    {
+      "id": "backend/purchasing/serializers/purchase_order.py:PurchaseOrderListSerializer",
+      "label": "PurchaseOrderListSerializer",
+      "file": "backend/purchasing/serializers/purchase_order.py",
+      "line": 73,
+      "type": "event",
+      "trace": null
+    }
+  ],
+  "edges": [
+    {
+      "from": "backend/purchasing/views/goods_receipt.py:GoodsReceiptViewSet",
+      "to": "backend/purchasing/views/goods_receipt.py:GoodsReceiptViewSet.get_queryset"
+    },
+    {
+      "from": "backend/purchasing/views/goods_receipt.py:GoodsReceiptViewSet",
+      "to": "backend/purchasing/views/goods_receipt.py:GoodsReceiptViewSet.get_serializer_class"
+    },
+    {
+      "from": "backend/purchasing/views/goods_receipt.py:GoodsReceiptViewSet",
+      "to": "backend/purchasing/views/goods_receipt.py:GoodsReceiptViewSet.perform_create"
+    },
+    {
+      "from": "backend/purchasing/views/invoice.py:InvoiceViewSet",
+      "to": "backend/purchasing/views/invoice.py:InvoiceViewSet.get_queryset"
+    },
+    {
+      "from": "backend/purchasing/views/invoice.py:InvoiceViewSet",
+      "to": "backend/purchasing/views/invoice.py:InvoiceViewSet.perform_create"
+    },
+    {
+      "from": "backend/purchasing/views/items.py:ItemViewSet",
+      "to": "backend/purchasing/views/items.py:ItemViewSet.get_queryset"
+    },
+    {
+      "from": "backend/purchasing/views/items.py:ItemViewSet",
+      "to": "backend/purchasing/views/items.py:ItemViewSet.get_serializer_class"
+    },
+    {
+      "from": "backend/purchasing/views/items.py:ItemViewSet",
+      "to": "backend/purchasing/views/items.py:ItemViewSet.perform_create"
+    },
+    {
+      "from": "backend/purchasing/views/items.py:ItemViewSet",
+      "to": "backend/purchasing/views/items.py:ItemViewSet.perform_destroy"
+    },
+    {
+      "from": "backend/purchasing/views/pdf.py:PurchaseOrderPDFView",
+      "to": "backend/purchasing/views/pdf.py:PurchaseOrderPDFView.get"
+    },
+    {
+      "from": "backend/purchasing/views/purchase_order.py:PurchaseOrderViewSet",
+      "to": "backend/purchasing/views/purchase_order.py:PurchaseOrderViewSet.get_queryset"
+    },
+    {
+      "from": "backend/purchasing/views/purchase_order.py:PurchaseOrderViewSet",
+      "to": "backend/purchasing/views/purchase_order.py:PurchaseOrderViewSet.get_serializer_class"
+    },
+    {
+      "from": "backend/purchasing/views/purchase_order.py:PurchaseOrderViewSet",
+      "to": "backend/purchasing/views/purchase_order.py:PurchaseOrderViewSet.perform_create"
+    },
+    {
+      "from": "backend/purchasing/views/quotes.py:SupplierQuoteViewSet",
+      "to": "backend/purchasing/views/quotes.py:SupplierQuoteViewSet.get_queryset"
+    }
+  ]
+}
