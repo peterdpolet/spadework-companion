@@ -10,7 +10,21 @@
     const picker = document.getElementById('diagramPicker');
     picker.addEventListener('change', function () {
         const selected = picker.options[picker.selectedIndex];
+        flipOverride = null;  // reset flip when switching diagrams
         vscode.postMessage({ command: 'loadDiagramFile', file: selected.dataset.file });
+    });
+
+    let flipOverride = null;  // null = use diagram default, 'horizontal' or 'vertical' = override
+    let lastDiagram  = null;  // store last loaded diagram for re-render on flip
+
+    const flipBtn = document.getElementById('flipBtn');
+    flipBtn.addEventListener('click', function () {
+        if (!lastDiagram) { return; }
+        const current = flipOverride !== null ? flipOverride : (lastDiagram.layout || 'vertical');
+        flipOverride  = current === 'horizontal' ? 'vertical' : 'horizontal';
+        flipBtn.textContent = flipOverride === 'horizontal' ? '↕ Vertical' : '↔ Horizontal';
+        clearSvg();
+        renderDiagram(Object.assign({}, lastDiagram, { layout: flipOverride }));
     });
 
     // ── Message handler ───────────────────────────────────────────────────────
@@ -18,7 +32,13 @@
     window.addEventListener('message', function(event) {
         const message = event.data;
         if (message.command === 'loadManifest') { populatePicker(message.data); }
-        if (message.command === 'loadDiagram')  { clearSvg(); renderDiagram(message.data); }
+        if (message.command === 'loadDiagram')  {
+            lastDiagram = message.data;
+            flipOverride = null;
+            flipBtn.textContent = (message.data.layout === 'horizontal') ? '↕ Vertical' : '↔ Horizontal';
+            clearSvg();
+            renderDiagram(message.data);
+        }
     });
 
     function populatePicker(manifest) {
@@ -144,25 +164,38 @@
         });
 
         // Convert depth+col to pixel positions
+        const horizontal = data.layout === 'horizontal';
+        const HORIZ_START_X = 100;  // left margin for horizontal diagrams
+        const HORIZ_CENTRE_Y = 300; // vertical centre for horizontal diagrams
         data.nodes.forEach(function(n) {
-            pos[n.id] = {
-                x: CENTRE_X + (col[n.id] || 0) * COL_GAP,
-                y: 40 + depth[n.id] * ROW_H,
-            };
+            if (horizontal) {
+                pos[n.id] = {
+                    x: HORIZ_START_X + depth[n.id] * ROW_H,
+                    y: HORIZ_CENTRE_Y + (col[n.id] || 0) * COL_GAP,
+                };
+            } else {
+                pos[n.id] = {
+                    x: CENTRE_X + (col[n.id] || 0) * COL_GAP,
+                    y: 40 + depth[n.id] * ROW_H,
+                };
+            }
         });
 
         // Canvas size
         const allX = Object.values(pos).map(function(p){ return p.x; });
         const allY = Object.values(pos).map(function(p){ return p.y; });
         const minX = Math.min.apply(null, allX);
+        const minY = Math.min.apply(null, allY);
         const maxX = Math.max.apply(null, allX);
         const maxY = Math.max.apply(null, allY);
 
         return {
-            pos: pos,
-            width:  Math.max(600, maxX - minX + NODE_W + 80),
-            height: maxY + ROW_H,
-            minX:   minX,
+            pos:        pos,
+            horizontal: horizontal,
+            width:      horizontal ? maxX + ROW_H        : Math.max(600, maxX - minX + NODE_W + 80),
+            height:     horizontal ? Math.max(600, maxY - minY + NODE_W + 80) : maxY + ROW_H,
+            minX:       minX,
+            minY:       minY,
         };
     }
 
@@ -170,9 +203,10 @@
 
     function renderDiagram(data) {
         const SVG_NS    = 'http://www.w3.org/2000/svg';
-        const NODE_W    = 180;
-        const NODE_H    = 44;
-        const ROW_H     = 100;
+        const horizontal = data.layout === 'horizontal';
+        const NODE_W    = horizontal ? 160 : 180;
+        const NODE_H    = horizontal ? 36  : 44;
+        const ROW_H     = horizontal ? 180 : 100;
         const TRACE_RING = '#9b6dff';
 
         const COLOURS = {
@@ -184,13 +218,17 @@
         const layout = computeLayout(data, NODE_W, ROW_H);
         const positions = layout.pos;
 
-        // Shift all x so nothing is clipped on the left
-        const shift = layout.minX < NODE_W / 2 + 20 ? (NODE_W / 2 + 20 - layout.minX) : 0;
-        Object.keys(positions).forEach(function(id) { positions[id].x += shift; });
+        // Shift so nothing is clipped
+        const shiftX = layout.minX < NODE_W / 2 + 20 ? (NODE_W / 2 + 20 - layout.minX) : 0;
+        const shiftY = layout.horizontal && layout.minY < NODE_W / 2 + 20 ? (NODE_W / 2 + 20 - layout.minY) : 0;
+        Object.keys(positions).forEach(function(id) {
+            positions[id].x += shiftX;
+            positions[id].y += shiftY;
+        });
 
         const svgEl = document.getElementById('diagram');
-        const totalW = layout.width + shift;
-        const totalH = layout.height + 60;
+        const totalW = layout.width  + shiftX;
+        const totalH = layout.height + shiftY + (layout.horizontal ? 0 : 60);
         svgEl.setAttribute('viewBox', '0 0 ' + totalW + ' ' + totalH);
         svgEl.setAttribute('height', totalH);
 
@@ -217,8 +255,10 @@
             const to   = positions[edge.to];
             if (!from || !to) { return; }
 
-            const x1 = from.x, y1 = from.y + NODE_H / 2;
-            const x2 = to.x,   y2 = to.y   - NODE_H / 2;
+            const x1 = horizontal ? from.x + NODE_W / 2 : from.x;
+            const y1 = horizontal ? from.y               : from.y + NODE_H / 2;
+            const x2 = horizontal ? to.x   - NODE_W / 2 : to.x;
+            const y2 = horizontal ? to.y                 : to.y   - NODE_H / 2;
 
             let pathEl;
             if (x1 === x2) {

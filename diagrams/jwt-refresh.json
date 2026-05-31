@@ -1,19 +1,20 @@
 {
   "id": "jwt-refresh",
   "title": "JWT Refresh Flow",
+  "layout": "horizontal",
   "nodes": [
-    { "id": "e1", "type": "event",    "label": "API request made",          "file": "src/utils/axios.js",  "line": 1  },
-    { "id": "f1", "type": "function", "label": "Attach access token",       "file": "src/utils/axios.js",  "line": 12 },
-    { "id": "f2", "type": "function", "label": "Request sent to Django",    "file": "src/utils/axios.js",  "line": 20 },
-    { "id": "e2", "type": "event",    "label": "401 Unauthorised received", "file": "src/utils/axios.js",  "line": 35 },
-    { "id": "f3", "type": "function", "label": "Interceptor catches 401",   "file": "src/utils/axios.js",  "line": 38 },
-    { "id": "f4", "type": "function", "label": "POST /api/token/refresh/",  "file": "src/utils/axios.js",  "line": 45 },
-    { "id": "d1", "type": "decision", "label": "Refresh\nsuccessful?",      "file": "src/utils/axios.js",  "line": 52 },
-    { "id": "f5", "type": "function", "label": "Store new access token",    "file": "src/utils/auth.js",   "line": 14 },
-    { "id": "f6", "type": "function", "label": "Retry original request",    "file": "src/utils/axios.js",  "line": 60 },
-    { "id": "e3", "type": "event",    "label": "Request succeeds",          "file": "src/utils/axios.js",  "line": 67 },
-    { "id": "f7", "type": "function", "label": "Clear tokens, redirect",    "file": "src/utils/auth.js",   "line": 28 },
-    { "id": "e4", "type": "event",    "label": "User logged out",           "file": "src/router/index.js", "line": 45 }
+    { "id": "e1", "type": "event",    "label": "API request made",          "file": "frontend/src/utils/axios.js",  "line": 1  },
+    { "id": "f1", "type": "function", "label": "Attach access token",       "file": "frontend/src/utils/axios.js",  "line": 12 },
+    { "id": "f2", "type": "function", "label": "Request sent to Django",    "file": "frontend/src/utils/axios.js",  "line": 20 },
+    { "id": "e2", "type": "event",    "label": "401 Unauthorised received", "file": "frontend/src/utils/axios.js",  "line": 35 },
+    { "id": "f3", "type": "function", "label": "Interceptor catches 401",   "file": "frontend/src/utils/axios.js",  "line": 38 },
+    { "id": "f4", "type": "function", "label": "POST /api/token/refresh/",  "file": "frontend/src/utils/axios.js",  "line": 45 },
+    { "id": "d1", "type": "decision", "label": "Refresh\nsuccessful?",     "file": "frontend/src/utils/axios.js",  "line": 52 },
+    { "id": "f5", "type": "function", "label": "Store new access token",    "file": "frontend/src/utils/auth.js",   "line": 14 },
+    { "id": "f6", "type": "function", "label": "Retry original request",    "file": "frontend/src/utils/axios.js",  "line": 60 },
+    { "id": "e3", "type": "event",    "label": "Request succeeds",          "file": "frontend/src/utils/axios.js",  "line": 67 },
+    { "id": "f7", "type": "function", "label": "Clear tokens, redirect",    "file": "frontend/src/utils/auth.js",   "line": 28 },
+    { "id": "e4", "type": "event",    "label": "User logged out",           "file": "frontend/src/router/index.js", "line": 45 }
   ],
   "edges": [
     { "from": "e1", "to": "f1" },

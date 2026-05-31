@@ -104,15 +104,29 @@ function getDiagramHtml(context: vscode.ExtensionContext, panel: vscode.WebviewP
             border-radius: 4px;
             padding: 4px 8px;
             font-size: 13px;
-            margin-bottom: 12px;
             cursor: pointer;
         }
         select:focus { outline: 1px solid #4a9eff; }
+        #flipBtn {
+            background: #2d2d2d;
+            color: #ccc;
+            border: 1px solid #555;
+            border-radius: 4px;
+            padding: 4px 10px;
+            font-size: 13px;
+            cursor: pointer;
+            margin-left: 8px;
+        }
+        #flipBtn:hover { border-color: #4a9eff; color: #4a9eff; }
+        .toolbar { display: flex; align-items: center; margin-bottom: 12px; gap: 0; }
     </style>
 </head>
 <body>
     <h3>Spadework Companion</h3>
-    <select id="diagramPicker"></select>
+    <div class="toolbar">
+        <select id="diagramPicker"></select>
+        <button id="flipBtn">↔ Horizontal</button>
+    </div>
     <svg id="diagram" xmlns="http://www.w3.org/2000/svg"></svg>
     <script src="${rendererUri}"></script>
 </body>
