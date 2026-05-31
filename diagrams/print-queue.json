@@ -1,0 +1,20 @@
+{
+  "id": "print-queue",
+  "title": "Print Queue Flow",
+  "layout": "horizontal",
+  "nodes": [
+    { "id": "backend/inventory/print_views.py:print_label",        "type": "event",    "label": "print_label\n(POST)",          "file": "backend/inventory/print_views.py", "line": 92  },
+    { "id": "backend/inventory/print_views.py:print_queue_count",  "type": "function", "label": "print_queue_count\n(GET)",     "file": "backend/inventory/print_views.py", "line": 119 },
+    { "id": "backend/inventory/print_views.py:trigger_batch_print","type": "function", "label": "trigger_batch_print\n(POST)",  "file": "backend/inventory/print_views.py", "line": 129 },
+    { "id": "backend/inventory/print_views.py:print_queue_pending", "type": "function","label": "print_queue_pending\n(GET)",   "file": "backend/inventory/print_views.py", "line": 152 },
+    { "id": "backend/inventory/print_views.py:print_queue_update", "type": "function", "label": "print_queue_update\n(PATCH)",  "file": "backend/inventory/print_views.py", "line": 178 },
+    { "id": "backend/inventory/print_views.py:done",               "type": "event",    "label": "Job done / failed",            "file": "backend/inventory/print_views.py", "line": 178 }
+  ],
+  "edges": [
+    { "from": "backend/inventory/print_views.py:print_label",         "to": "backend/inventory/print_views.py:print_queue_count" },
+    { "from": "backend/inventory/print_views.py:print_queue_count",   "to": "backend/inventory/print_views.py:trigger_batch_print" },
+    { "from": "backend/inventory/print_views.py:trigger_batch_print", "to": "backend/inventory/print_views.py:print_queue_pending" },
+    { "from": "backend/inventory/print_views.py:print_queue_pending", "to": "backend/inventory/print_views.py:print_queue_update" },
+    { "from": "backend/inventory/print_views.py:print_queue_update",  "to": "backend/inventory/print_views.py:done" }
+  ]
+}

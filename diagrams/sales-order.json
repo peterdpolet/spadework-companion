@@ -1,0 +1,18 @@
+{
+  "id": "sales-order",
+  "title": "Sales Order Flow",
+  "layout": "vertical",
+  "nodes": [
+    { "id": "backend/sales/views.py:SalesOrderViewSet.create",      "type": "function", "label": "SalesOrderViewSet.create",    "file": "backend/sales/views.py",                    "line": 17  },
+    { "id": "backend/sales/views.py:SalesOrderViewSet.list",        "type": "function", "label": "SalesOrderViewSet.list",      "file": "backend/sales/views.py",                    "line": 17  },
+    { "id": "backend/matching/views.py:ThreeWayMatchView.post",     "type": "function", "label": "ThreeWayMatchView.post",      "file": "backend/matching/views.py",                 "line": 341 },
+    { "id": "backend/inventory/print_views.py:print_label",         "type": "function", "label": "print_label",                 "file": "backend/inventory/print_views.py",          "line": 92  },
+    { "id": "backend/inventory/print_views.py:print_queue_pending", "type": "function", "label": "print_queue_pending",         "file": "backend/inventory/print_views.py",          "line": 152 }
+  ],
+  "edges": [
+    { "from": "backend/sales/views.py:SalesOrderViewSet.create", "to": "backend/sales/views.py:SalesOrderViewSet.list" },
+    { "from": "backend/sales/views.py:SalesOrderViewSet.list",   "to": "backend/matching/views.py:ThreeWayMatchView.post" },
+    { "from": "backend/matching/views.py:ThreeWayMatchView.post","to": "backend/inventory/print_views.py:print_label" },
+    { "from": "backend/inventory/print_views.py:print_label",    "to": "backend/inventory/print_views.py:print_queue_pending" }
+  ]
+}

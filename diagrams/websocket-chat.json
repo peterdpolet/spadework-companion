@@ -1,0 +1,18 @@
+{
+  "id": "websocket-chat",
+  "title": "WebSocket Chat Flow",
+  "layout": "vertical",
+  "nodes": [
+    { "id": "frontend/src/utils/axios.js:wsConnect",                "type": "event",    "label": "Client connects\n?token=<jwt>",  "file": "frontend/src/utils/axios.js",       "line": 1  },
+    { "id": "backend/chat/chat/consumers.py:ChatConsumer.connect",  "type": "function", "label": "ChatConsumer.connect",            "file": "backend/chat/chat/consumers.py",    "line": 9  },
+    { "id": "backend/chat/chat/consumers.py:ChatConsumer.receive",  "type": "function", "label": "ChatConsumer.receive",            "file": "backend/chat/chat/consumers.py",    "line": 53 },
+    { "id": "backend/chat/chat/consumers.py:ChatConsumer.disconnect","type": "function","label": "ChatConsumer.disconnect",         "file": "backend/chat/chat/consumers.py",    "line": 37 },
+    { "id": "backend/chat/chat/consumers.py:done",                  "type": "event",    "label": "Connection closed",              "file": "backend/chat/chat/consumers.py",    "line": 37 }
+  ],
+  "edges": [
+    { "from": "frontend/src/utils/axios.js:wsConnect",                 "to": "backend/chat/chat/consumers.py:ChatConsumer.connect" },
+    { "from": "backend/chat/chat/consumers.py:ChatConsumer.connect",   "to": "backend/chat/chat/consumers.py:ChatConsumer.receive" },
+    { "from": "backend/chat/chat/consumers.py:ChatConsumer.receive",   "to": "backend/chat/chat/consumers.py:ChatConsumer.disconnect" },
+    { "from": "backend/chat/chat/consumers.py:ChatConsumer.disconnect","to": "backend/chat/chat/consumers.py:done" }
+  ]
+}
