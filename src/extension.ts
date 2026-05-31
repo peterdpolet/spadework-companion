@@ -24,68 +24,58 @@ export async function activate(context: vscode.ExtensionContext) {
 
             if (message.command === 'ready') {
 
-                // ── Build graph from tracesMap ─────────────────────────────
                 const calls: CallRecord[] = [
                     {
                         id:        'backend/matching/views.py:ThreeWayMatchView.post',
                         label:     'ThreeWayMatchView.post',
                         file:      'backend/matching/views.py',
-                        line:      1,
+                        line:      341,
                         timestamp: Date.now(),
                     },
                     {
-                        id:        'backend/purchasing/views.py:PurchaseOrderViewSet.create',
-                        label:     'PurchaseOrderViewSet.create',
-                        file:      'backend/purchasing/views.py',
-                        line:      1,
+                        id:        'backend/purchasing/views/purchase_order.py:PurchaseOrderViewSet',
+                        label:     'PurchaseOrderViewSet',
+                        file:      'backend/purchasing/views/purchase_order.py',
+                        line:      16,
                         timestamp: Date.now(),
                         parentId:  'backend/matching/views.py:ThreeWayMatchView.post',
                     },
                     {
-                        id:        'backend/goods_receipt/views.py:GoodsReceiptViewSet.create',
-                        label:     'GoodsReceiptViewSet.create',
-                        file:      'backend/goods_receipt/views.py',
-                        line:      1,
+                        id:        'backend/purchasing/views/goods_receipt.py:GoodsReceiptViewSet',
+                        label:     'GoodsReceiptViewSet',
+                        file:      'backend/purchasing/views/goods_receipt.py',
+                        line:      13,
                         timestamp: Date.now(),
                         parentId:  'backend/matching/views.py:ThreeWayMatchView.post',
                     },
                     {
-                        id:        'backend/matching/views.py:MatchingRequestViewSet._calculate_variance',
-                        label:     'MatchingRequestViewSet\n._calculate_variance',
-                        file:      'backend/matching/views.py',
-                        line:      1,
+                        id:        'backend/inventory/print_views.py:print_label',
+                        label:     'print_label',
+                        file:      'backend/inventory/print_views.py',
+                        line:      92,
                         timestamp: Date.now(),
                         parentId:  'backend/matching/views.py:ThreeWayMatchView.post',
                     },
                     {
-                        id:        'backend/printing/print_views.py:PrintJobView.post',
-                        label:     'PrintJobView.post',
-                        file:      'backend/printing/print_views.py',
-                        line:      1,
+                        id:        'backend/inventory/print_views.py:print_queue_pending',
+                        label:     'print_queue_pending',
+                        file:      'backend/inventory/print_views.py',
+                        line:      152,
                         timestamp: Date.now(),
-                        parentId:  'backend/matching/views.py:ThreeWayMatchView.post',
-                    },
-                    {
-                        id:        'backend/printing/print_service.py:PrintService.execute',
-                        label:     'PrintService.execute',
-                        file:      'backend/printing/print_service.py',
-                        line:      1,
-                        timestamp: Date.now(),
-                        parentId:  'backend/printing/print_views.py:PrintJobView.post',
+                        parentId:  'backend/inventory/print_views.py:print_label',
                     },
                 ];
 
                 const graph = buildGraph(calls, tracesMap);
 
-                // Adapt to the shape renderer.js already understands
                 const data = {
                     nodes: graph.nodes.map(n => ({
                         id:    n.id,
                         label: n.label,
                         file:  n.file,
                         line:  n.line,
-                        type:  'function',   // renderer colour bucket
-                        trace: n.trace,      // new — tooltip description
+                        type:  'function',
+                        trace: n.trace,
                     })),
                     edges: graph.edges,
                 };
@@ -94,8 +84,8 @@ export async function activate(context: vscode.ExtensionContext) {
             }
 
             if (message.command === 'openFile') {
-                const workspaceRoot = vscode.workspace.workspaceFolders?.[0].uri.fsPath;
-                if (!workspaceRoot) return;
+                const workspaceRoot = vscode.workspace.workspaceFolders?.[0].uri.fsPath
+                    ?? '/home/websites/emillar_v2';
 
                 const filePath = path.join(workspaceRoot, message.file);
                 const uri = vscode.Uri.file(filePath);
