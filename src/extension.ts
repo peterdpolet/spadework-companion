@@ -127,6 +127,7 @@ function getDiagramHtml(context: vscode.ExtensionContext, panel: vscode.WebviewP
         <select id="diagramPicker"></select>
         <button id="flipBtn">↔ Horizontal</button>
     </div>
+    <h4 id="diagramTitle" style="color:#888;font-size:12px;font-weight:normal;margin:0 0 10px 0;"></h4>
     <svg id="diagram" xmlns="http://www.w3.org/2000/svg"></svg>
     <script src="${rendererUri}"></script>
 </body>

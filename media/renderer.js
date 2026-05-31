@@ -23,6 +23,7 @@
         const current = flipOverride !== null ? flipOverride : (lastDiagram.layout || 'vertical');
         flipOverride  = current === 'horizontal' ? 'vertical' : 'horizontal';
         flipBtn.textContent = flipOverride === 'horizontal' ? '↕ Vertical' : '↔ Horizontal';
+        document.getElementById('diagramTitle').textContent = lastDiagram.title || '';
         clearSvg();
         renderDiagram(Object.assign({}, lastDiagram, { layout: flipOverride }));
     });
@@ -36,6 +37,7 @@
             lastDiagram = message.data;
             flipOverride = null;
             flipBtn.textContent = (message.data.layout === 'horizontal') ? '↕ Vertical' : '↔ Horizontal';
+            document.getElementById('diagramTitle').textContent = message.data.title || '';
             clearSvg();
             renderDiagram(message.data);
         }
