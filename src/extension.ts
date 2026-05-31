@@ -1,8 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
-import { loadTracesMap } from './tracesLoader';
-import { buildGraph, CallRecord } from './tracer';
+import { loadTracesMap, TracesMap } from './tracesLoader';
 
 export async function activate(context: vscode.ExtensionContext) {
 
@@ -23,64 +22,20 @@ export async function activate(context: vscode.ExtensionContext) {
         panel.webview.onDidReceiveMessage(async (message) => {
 
             if (message.command === 'ready') {
+                // Send manifest so webview can populate the dropdown
+                const manifestPath = path.join(context.extensionPath, 'diagrams', 'manifest.json');
+                const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+                panel.webview.postMessage({ command: 'loadManifest', data: manifest });
 
-                const calls: CallRecord[] = [
-                    {
-                        id:        'backend/matching/views.py:ThreeWayMatchView.post',
-                        label:     'ThreeWayMatchView.post',
-                        file:      'backend/matching/views.py',
-                        line:      341,
-                        timestamp: Date.now(),
-                    },
-                    {
-                        id:        'backend/purchasing/views/purchase_order.py:PurchaseOrderViewSet',
-                        label:     'PurchaseOrderViewSet',
-                        file:      'backend/purchasing/views/purchase_order.py',
-                        line:      16,
-                        timestamp: Date.now(),
-                        parentId:  'backend/matching/views.py:ThreeWayMatchView.post',
-                    },
-                    {
-                        id:        'backend/purchasing/views/goods_receipt.py:GoodsReceiptViewSet',
-                        label:     'GoodsReceiptViewSet',
-                        file:      'backend/purchasing/views/goods_receipt.py',
-                        line:      13,
-                        timestamp: Date.now(),
-                        parentId:  'backend/matching/views.py:ThreeWayMatchView.post',
-                    },
-                    {
-                        id:        'backend/inventory/print_views.py:print_label',
-                        label:     'print_label',
-                        file:      'backend/inventory/print_views.py',
-                        line:      92,
-                        timestamp: Date.now(),
-                        parentId:  'backend/matching/views.py:ThreeWayMatchView.post',
-                    },
-                    {
-                        id:        'backend/inventory/print_views.py:print_queue_pending',
-                        label:     'print_queue_pending',
-                        file:      'backend/inventory/print_views.py',
-                        line:      152,
-                        timestamp: Date.now(),
-                        parentId:  'backend/inventory/print_views.py:print_label',
-                    },
-                ];
+                // Load the first diagram by default
+                const firstFile = manifest.diagrams[0]?.file;
+                if (firstFile) {
+                    sendDiagram(panel, context, firstFile, tracesMap);
+                }
+            }
 
-                const graph = buildGraph(calls, tracesMap);
-
-                const data = {
-                    nodes: graph.nodes.map(n => ({
-                        id:    n.id,
-                        label: n.label,
-                        file:  n.file,
-                        line:  n.line,
-                        type:  'function',
-                        trace: n.trace,
-                    })),
-                    edges: graph.edges,
-                };
-
-                panel.webview.postMessage({ command: 'loadDiagram', data });
+            if (message.command === 'loadDiagramFile') {
+                sendDiagram(panel, context, message.file, tracesMap);
             }
 
             if (message.command === 'openFile') {
@@ -104,6 +59,27 @@ export async function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(disposable);
 }
 
+function sendDiagram(
+    panel: vscode.WebviewPanel,
+    context: vscode.ExtensionContext,
+    file: string,
+    tracesMap: TracesMap
+) {
+    const diagramPath = path.join(context.extensionPath, 'diagrams', file);
+    const diagram = JSON.parse(fs.readFileSync(diagramPath, 'utf8'));
+
+    // Annotate nodes with trace descriptions from tracesMap
+    const annotated = {
+        ...diagram,
+        nodes: diagram.nodes.map((n: any) => ({
+            ...n,
+            trace: tracesMap.get(n.id),
+        })),
+    };
+
+    panel.webview.postMessage({ command: 'loadDiagram', data: annotated });
+}
+
 export function deactivate() {}
 
 
@@ -119,12 +95,24 @@ function getDiagramHtml(context: vscode.ExtensionContext, panel: vscode.WebviewP
     <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src ${panel.webview.cspSource}; style-src 'unsafe-inline';">
     <style>
         body { background: #1e1e1e; color: #ccc; font-family: sans-serif; margin: 0; padding: 16px; }
-        h3 { color: #4a9eff; margin-bottom: 12px; }
+        h3 { color: #4a9eff; margin-bottom: 8px; }
         svg { width: 100%; }
+        select {
+            background: #2d2d2d;
+            color: #ccc;
+            border: 1px solid #555;
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-size: 13px;
+            margin-bottom: 12px;
+            cursor: pointer;
+        }
+        select:focus { outline: 1px solid #4a9eff; }
     </style>
 </head>
 <body>
-    <h3>Three-Way Match Flow — Ewan Millar</h3>
+    <h3>Spadework Companion</h3>
+    <select id="diagramPicker"></select>
     <svg id="diagram" xmlns="http://www.w3.org/2000/svg"></svg>
     <script src="${rendererUri}"></script>
 </body>

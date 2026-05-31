@@ -1,0 +1,17 @@
+{
+  "id": "three-way-match",
+  "title": "Three-Way Match Flow",
+  "nodes": [
+    { "id": "backend/matching/views.py:ThreeWayMatchView.post",                    "type": "function", "label": "ThreeWayMatchView.post",     "file": "backend/matching/views.py",                          "line": 341 },
+    { "id": "backend/purchasing/views/purchase_order.py:PurchaseOrderViewSet",     "type": "function", "label": "PurchaseOrderViewSet",        "file": "backend/purchasing/views/purchase_order.py",         "line": 16  },
+    { "id": "backend/purchasing/views/goods_receipt.py:GoodsReceiptViewSet",       "type": "function", "label": "GoodsReceiptViewSet",         "file": "backend/purchasing/views/goods_receipt.py",          "line": 13  },
+    { "id": "backend/inventory/print_views.py:print_label",                        "type": "function", "label": "print_label",                 "file": "backend/inventory/print_views.py",                   "line": 92  },
+    { "id": "backend/inventory/print_views.py:print_queue_pending",                "type": "function", "label": "print_queue_pending",         "file": "backend/inventory/print_views.py",                   "line": 152 }
+  ],
+  "edges": [
+    { "from": "backend/matching/views.py:ThreeWayMatchView.post",                  "to": "backend/purchasing/views/purchase_order.py:PurchaseOrderViewSet" },
+    { "from": "backend/matching/views.py:ThreeWayMatchView.post",                  "to": "backend/purchasing/views/goods_receipt.py:GoodsReceiptViewSet" },
+    { "from": "backend/matching/views.py:ThreeWayMatchView.post",                  "to": "backend/inventory/print_views.py:print_label" },
+    { "from": "backend/inventory/print_views.py:print_label",                      "to": "backend/inventory/print_views.py:print_queue_pending" }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "diagrams": [
+    {
+      "id": "three-way-match",
+      "title": "Three-Way Match Flow",
+      "file": "three-way-match.json"
+    },
+    {
+      "id": "jwt-refresh",
+      "title": "JWT Refresh Flow",
+      "file": "jwt-refresh.json"
+    }
+  ]
+}

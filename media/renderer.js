@@ -5,13 +5,45 @@
 
     vscode.postMessage({ command: 'ready' });
 
+    // ── Diagram picker ────────────────────────────────────────────────────────
+
+    const picker = document.getElementById('diagramPicker');
+    picker.addEventListener('change', function () {
+        const selected = picker.options[picker.selectedIndex];
+        vscode.postMessage({ command: 'loadDiagramFile', file: selected.dataset.file });
+    });
+
+    // ── Message handler ───────────────────────────────────────────────────────
+
     window.addEventListener('message', function(event) {
         const message = event.data;
         console.log('message received:', message.command);
+
+        if (message.command === 'loadManifest') {
+            populatePicker(message.data);
+        }
+
         if (message.command === 'loadDiagram') {
+            clearSvg();
             renderDiagram(message.data);
         }
     });
+
+    function populatePicker(manifest) {
+        picker.innerHTML = '';
+        manifest.diagrams.forEach(function(d) {
+            const opt = document.createElement('option');
+            opt.value = d.id;
+            opt.textContent = d.title;
+            opt.dataset.file = d.file;
+            picker.appendChild(opt);
+        });
+    }
+
+    function clearSvg() {
+        const svgEl = document.getElementById('diagram');
+        while (svgEl.firstChild) { svgEl.removeChild(svgEl.firstChild); }
+    }
 
     // ── Tooltip ───────────────────────────────────────────────────────────────
 
@@ -45,10 +77,8 @@
     }
 
     function moveTooltip(e) {
-        const x = e.clientX + 14;
-        const y = e.clientY - 10;
-        tooltip.style.left = x + 'px';
-        tooltip.style.top  = y + 'px';
+        tooltip.style.left = (e.clientX + 14) + 'px';
+        tooltip.style.top  = (e.clientY - 10) + 'px';
     }
 
     function hideTooltip() {
@@ -66,22 +96,20 @@
     // ── Renderer ──────────────────────────────────────────────────────────────
 
     function renderDiagram(data) {
-        console.log('renderDiagram called');
+        console.log('renderDiagram called', data.title);
 
         const SVG_NS = 'http://www.w3.org/2000/svg';
         const NODE_W = 180;
         const NODE_H = 44;
         const COL_X  = 300;
         const ROW_H  = 100;
+        const TRACE_RING = '#9b6dff';
 
         const COLOURS = {
             event:    { fill: '#1a3a5c', stroke: '#4a9eff' },
             function: { fill: '#2d5a2d', stroke: '#4aff6f' },
             decision: { fill: '#5a3a1a', stroke: '#ffaa4a' }
         };
-
-        // Nodes with a trace description get a subtle highlight ring
-        const TRACE_RING = '#9b6dff';
 
         const positions = {};
         data.nodes.forEach(function(node, i) {
@@ -109,8 +137,7 @@
         defs.appendChild(marker);
         svgEl.appendChild(defs);
 
-        // ── Edges ─────────────────────────────────────────────────────────────
-
+        // Edges
         data.edges.forEach(function(edge) {
             const from = positions[edge.from];
             const to   = positions[edge.to];
@@ -127,16 +154,14 @@
                 const t = el('text', {
                     x: (from.x + to.x) / 2 + 8,
                     y: (from.y + NODE_H / 2 + to.y - NODE_H / 2) / 2,
-                    fill: '#aaa', 'font-size': '11',
-                    'dominant-baseline': 'middle'
+                    fill: '#aaa', 'font-size': '11', 'dominant-baseline': 'middle'
                 });
                 t.textContent = edge.label;
                 svgEl.appendChild(t);
             }
         });
 
-        // ── Nodes ─────────────────────────────────────────────────────────────
-
+        // Nodes
         data.nodes.forEach(function(node) {
             const pos = positions[node.id];
             const cx  = pos.x;
@@ -150,16 +175,14 @@
             g.addEventListener('click', function() {
                 vscode.postMessage({ command: 'openFile', file: node.file, line: node.line });
             });
-
             g.addEventListener('mouseenter', function(e) { showTooltip(e, node); });
             g.addEventListener('mousemove',  function(e) { moveTooltip(e); });
             g.addEventListener('mouseleave', hideTooltip);
 
-            // Optional trace ring (drawn behind the node shape)
+            // Trace ring
             if (hasTrace) {
                 if (node.type === 'decision') {
-                    const hw = NODE_W / 2 + 4;
-                    const hh = NODE_H / 2 + 10;
+                    const hw = NODE_W / 2 + 4, hh = NODE_H / 2 + 10;
                     g.appendChild(el('polygon', {
                         points: cx+','+(cy-hh)+' '+(cx+hw)+','+cy+' '+cx+','+(cy+hh)+' '+(cx-hw)+','+cy,
                         fill: 'none', stroke: TRACE_RING, 'stroke-width': '1', opacity: '0.5'
@@ -182,8 +205,7 @@
                     fill: col.fill, stroke: col.stroke, 'stroke-width': '2'
                 }));
             } else if (node.type === 'decision') {
-                const hw = NODE_W / 2;
-                const hh = NODE_H / 2 + 6;
+                const hw = NODE_W / 2, hh = NODE_H / 2 + 6;
                 g.appendChild(el('polygon', {
                     points: cx+','+(cy-hh)+' '+(cx+hw)+','+cy+' '+cx+','+(cy+hh)+' '+(cx-hw)+','+cy,
                     fill: col.fill, stroke: col.stroke, 'stroke-width': '2'
@@ -196,7 +218,7 @@
                 }));
             }
 
-            // Label text
+            // Label
             const lines  = node.label.split('\n');
             const lineH  = 14;
             const startY = cy - ((lines.length - 1) * lineH) / 2;
@@ -210,13 +232,11 @@
                 g.appendChild(t);
             });
 
-            // Small dot indicator when trace description exists
+            // Trace dot
             if (hasTrace) {
                 g.appendChild(el('circle', {
-                    cx: cx + NODE_W / 2 - 6,
-                    cy: cy - NODE_H / 2 + 6,
-                    r: '4',
-                    fill: TRACE_RING
+                    cx: cx + NODE_W / 2 - 6, cy: cy - NODE_H / 2 + 6,
+                    r: '4', fill: TRACE_RING
                 }));
             }
 
