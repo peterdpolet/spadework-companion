@@ -6,13 +6,14 @@
             "type": "extensionHost",
             "request": "launch",
             "args": [
-                "--extensionDevelopmentPath=${workspaceFolder}",
-                "--folder-uri=file:///home/websites/emillar_v2"
+                "--extensionDevelopmentPath=${workspaceFolder}"
             ],
+            "env": {
+                "VSCODE_FOLDER": "/home/websites/emillar_v2"
+            },
             "outFiles": [
                 "${workspaceFolder}/out/**/*.js"
-            ],
-            "preLaunchTask": "npm: compile"
+            ]
         }
     ]
 }

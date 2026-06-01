@@ -15,9 +15,32 @@
     "commands": [
       {
         "command": "spadework.openDiagram",
-        "title": "Spadework: Open Diagram"
+        "title": "Open Diagram",
+        "category": "Spadework"
+      },
+      {
+        "command": "spadework-companion.traceEpc",
+        "title": "Trace EPC from cursor",
+        "category": "Spadework"
       }
-    ]
+    ],
+    "keybindings": [
+      {
+        "command": "spadework-companion.traceEpc",
+        "key": "ctrl+shift+e",
+        "mac": "cmd+shift+e",
+        "when": "editorTextFocus"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "spadework-companion.traceEpc",
+          "when": "editorTextFocus && resourceExtname =~ /\\.(vue|ts|js|py)$/",
+          "group": "spadework@1"
+        }
+      ]
+    }
   },
   "scripts": {
     "compile": "tsc -p ./",

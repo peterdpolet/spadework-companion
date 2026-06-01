@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spadework EPC Viewer</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:       #ffffff;
+    --bg2:      #f5f4f0;
+    --bg3:      #eeece8;
+    --border:   rgba(0,0,0,0.1);
+    --border2:  rgba(0,0,0,0.18);
+    --text:     #1a1a18;
+    --text2:    #5a5a56;
+    --text3:    #8a8a84;
+    --blue:     #185fa5;
+    --blue-bg:  #e6f1fb;
+    --green:    #3b6d11;
+    --green-bg: #eaf3de;
+    --amber:    #854f0b;
+    --amber-bg: #faeeda;
+    --gray:     #444441;
+    --gray-bg:  #f1efe8;
+    --red:      #a32d2d;
+    --red-bg:   #fcebeb;
+    --purple:   #534ab7;
+    --purple-bg:#eeedfe;
+    --mono:     "JetBrains Mono", "Fira Code", "Cascadia Code", monospace;
+    --sans:     system-ui, -apple-system, sans-serif;
+    --radius:   8px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg:      #1c1c1a;  --bg2:     #252522;  --bg3:     #2e2e2b;
+      --border:  rgba(255,255,255,0.1); --border2: rgba(255,255,255,0.18);
+      --text:    #e8e6de;  --text2:   #a0a09a;  --text3:   #686864;
+      --blue:    #85b7eb;  --blue-bg: #042c53;
+      --green:   #97c459;  --green-bg:#173404;
+      --amber:   #ef9f27;  --amber-bg:#412402;
+      --gray:    #b4b2a9;  --gray-bg: #2c2c2a;
+      --red:     #f09595;  --red-bg:  #501313;
+      --purple:  #afa9ec;  --purple-bg:#26215c;
+    }
+  }
+
+  html, body { height: 100%; font-family: var(--sans); background: var(--bg); color: var(--text); font-size: 14px; line-height: 1.6; }
+
+  /* Layout */
+  #app { display: grid; grid-template-rows: 52px 1fr; height: 100vh; }
+  #header { display: flex; align-items: center; gap: 12px; padding: 0 20px; border-bottom: 0.5px solid var(--border); background: var(--bg); position: sticky; top: 0; z-index: 100; }
+  #header h1 { font-size: 14px; font-weight: 500; flex: 1; }
+  #header .meta { font-size: 12px; color: var(--text3); }
+  #body { display: grid; grid-template-columns: 1fr 380px; overflow: hidden; }
+  #tree-panel { overflow-y: auto; padding: 20px; }
+  #detail-panel { border-left: 0.5px solid var(--border); overflow-y: auto; padding: 20px; background: var(--bg2); }
+
+  /* Stats bar */
+  #stats { display: flex; gap: 16px; margin-bottom: 20px; padding: 10px 14px; background: var(--bg2); border-radius: var(--radius); border: 0.5px solid var(--border); flex-wrap: wrap; }
+  .stat { font-size: 12px; color: var(--text2); display: flex; align-items: center; gap: 5px; }
+  .stat strong { color: var(--text); }
+
+  /* Drop zone */
+  #drop-zone { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; height: 60vh; color: var(--text2); border: 1.5px dashed var(--border2); border-radius: 12px; cursor: pointer; transition: background .15s; }
+  #drop-zone:hover, #drop-zone.drag-over { background: var(--blue-bg); }
+  #drop-zone svg { opacity: .4; }
+  #drop-zone p { font-size: 13px; }
+  #drop-zone small { font-size: 11px; color: var(--text3); font-family: var(--mono); }
+  #file-input { display: none; }
+
+  /* Tree */
+  .tree-root { padding-left: 0; }
+  .tree-children { padding-left: 20px; border-left: 0.5px solid var(--border); margin-left: 9px; }
+  .tree-children.boundary-branch { border-left: 0.5px dashed var(--amber); }
+  .node { margin: 3px 0; }
+  .node-row { display: flex; align-items: flex-start; gap: 8px; padding: 6px 8px; border-radius: var(--radius); cursor: pointer; transition: background .1s; position: relative; }
+  .node-row:hover { background: var(--bg2); }
+  .node-row.selected { background: var(--blue-bg); }
+  .node-toggle { width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; font-size: 10px; color: var(--text3); cursor: pointer; user-select: none; transition: transform .15s; }
+  .node-toggle.open { transform: rotate(90deg); }
+  .node-toggle.leaf { opacity: 0; cursor: default; }
+  .node-body { flex: 1; min-width: 0; }
+  .node-name { font-size: 13px; font-weight: 500; font-family: var(--mono); color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .node-desc { font-size: 12px; color: var(--text2); margin-top: 1px; font-style: italic; line-height: 1.4; }
+  .node-file { font-size: 11px; color: var(--text3); font-family: var(--mono); margin-top: 2px; }
+  .node-warning { font-size: 11px; color: var(--amber); margin-top: 2px; }
+
+  /* Badges */
+  .badge { display: inline-flex; align-items: center; padding: 1px 7px; border-radius: 99px; font-size: 11px; font-weight: 500; white-space: nowrap; flex-shrink: 0; }
+  .badge-event   { background: var(--blue-bg);   color: var(--blue); }
+  .badge-fn      { background: var(--green-bg);  color: var(--green); }
+  .badge-pinia   { background: var(--green-bg);  color: var(--green); }
+  .badge-api     { background: var(--amber-bg);  color: var(--amber); }
+  .badge-django  { background: var(--gray-bg);   color: var(--gray); }
+  .badge-signal  { background: var(--red-bg);    color: var(--red); }
+  .badge-unknown { background: var(--bg3);       color: var(--text3); }
+
+  /* Detail panel */
+  #detail-panel h2 { font-size: 14px; font-weight: 500; margin-bottom: 4px; font-family: var(--mono); word-break: break-all; }
+  #detail-panel .detail-desc { font-size: 13px; color: var(--text2); font-style: italic; margin-bottom: 14px; line-height: 1.5; }
+  .detail-meta { display: flex; flex-direction: column; gap: 4px; margin-bottom: 16px; }
+  .detail-meta-row { display: flex; align-items: baseline; gap: 8px; font-size: 12px; }
+  .detail-meta-row .key { color: var(--text3); width: 60px; flex-shrink: 0; }
+  .detail-meta-row .val { color: var(--text); font-family: var(--mono); word-break: break-all; }
+  .snippet-header { font-size: 11px; color: var(--text3); margin-bottom: 6px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; }
+  .snippet { background: var(--bg3); border-radius: var(--radius); padding: 12px 14px; overflow-x: auto; }
+  .snippet pre { font-family: var(--mono); font-size: 12px; line-height: 1.6; color: var(--text); white-space: pre; }
+  .detail-empty { color: var(--text3); font-size: 13px; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 200px; gap: 8px; text-align: center; }
+
+  /* Warning box */
+  .warning-box { background: var(--amber-bg); border-radius: var(--radius); padding: 8px 12px; font-size: 12px; color: var(--amber); margin-bottom: 12px; line-height: 1.5; }
+  .django-note { background: var(--blue-bg); border-radius: var(--radius); padding: 8px 12px; font-size: 12px; color: var(--blue); margin-bottom: 12px; line-height: 1.5; }
+
+  /* Toolbar */
+  .toolbar { display: flex; gap: 6px; margin-bottom: 16px; align-items: center; }
+  .btn { padding: 5px 12px; font-size: 12px; border-radius: var(--radius); border: 0.5px solid var(--border2); background: transparent; color: var(--text); cursor: pointer; display: flex; align-items: center; gap: 5px; font-family: var(--sans); transition: background .1s; }
+  .btn:hover { background: var(--bg3); }
+  .btn-primary { background: var(--text); color: var(--bg); border-color: transparent; }
+  .btn-primary:hover { opacity: .85; }
+  .search-box { flex: 1; padding: 5px 10px; font-size: 12px; border-radius: var(--radius); border: 0.5px solid var(--border2); background: var(--bg); color: var(--text); font-family: var(--sans); outline: none; }
+  .search-box:focus { border-color: var(--blue); }
+
+  /* Highlight */
+  .match { background: rgba(239,159,39,.35); border-radius: 2px; }
+
+  /* Boundary connector hint */
+  .boundary-hint { font-size: 11px; color: var(--amber); padding: 3px 8px; margin: 4px 0 2px 24px; opacity: .8; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="header">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--blue);flex-shrink:0"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+    <h1 id="header-title">Spadework EPC Viewer</h1>
+    <span class="meta" id="header-meta"></span>
+    <button class="btn" onclick="document.getElementById('file-input').click()">Load JSON</button>
+  </div>
+  <div id="body">
+    <div id="tree-panel">
+      <div id="tree-content">
+        <div id="drop-zone" onclick="document.getElementById('file-input').click()">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+          <p>Drop an EPC JSON file here, or click to load</p>
+          <small>epc_submitOrder.json</small>
+        </div>
+      </div>
+    </div>
+    <div id="detail-panel">
+      <div class="detail-empty">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:.3"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35M11 8v6M8 11h6"/></svg>
+        <span>Select a node to inspect it</span>
+      </div>
+    </div>
+  </div>
+</div>
+<input type="file" id="file-input" accept=".json">
+
+<script>
+let epcData = null;
+let selectedId = null;
+let searchTerm = "";
+let expandedIds = new Set();
+
+// ---------------------------------------------------------------------------
+// File loading
+// ---------------------------------------------------------------------------
+const fileInput = document.getElementById("file-input");
+fileInput.addEventListener("change", e => {
+  const file = e.target.files[0];
+  if (file) loadFile(file);
+});
+
+const dropZone = document.getElementById("drop-zone");
+document.body.addEventListener("dragover", e => { e.preventDefault(); dropZone.classList.add("drag-over"); });
+document.body.addEventListener("dragleave", () => dropZone.classList.remove("drag-over"));
+document.body.addEventListener("drop", e => {
+  e.preventDefault();
+  dropZone.classList.remove("drag-over");
+  const file = e.dataTransfer.files[0];
+  if (file) loadFile(file);
+});
+
+function loadFile(file) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      epcData = JSON.parse(e.target.result);
+      initViewer();
+    } catch(err) {
+      alert("Could not parse JSON: " + err.message);
+    }
+  };
+  reader.readAsText(file);
+}
+
+// Also support ?data= URL param (for VSCode webview injection)
+window.addEventListener("message", e => {
+  if (e.data && e.data.type === "epc_data") {
+    epcData = e.data.payload;
+    initViewer();
+  }
+});
+
+// ---------------------------------------------------------------------------
+// Init
+// ---------------------------------------------------------------------------
+function initViewer() {
+  const meta = epcData.meta || {};
+  const tree = epcData.tree;
+
+  document.getElementById("header-title").textContent =
+    "EPC — " + (tree.label || meta.entry || "trace");
+  document.getElementById("header-meta").textContent =
+    `${meta.files_traced || "?"} files · depth ${meta.depth_limit || "?"}`;
+
+  // Expand root and first level by default
+  expandedIds = new Set();
+  expandedIds.add(tree.id);
+  (tree.children || []).forEach(c => expandedIds.add(c.id));
+
+  renderTree();
+}
+
+// ---------------------------------------------------------------------------
+// Stats
+// ---------------------------------------------------------------------------
+function computeStats(node, acc = { fn: 0, api: 0, django: 0, signal: 0, files: new Set(), warnings: 0 }) {
+  acc.files.add(node.file);
+  if (node.type === "api") acc.api++;
+  else if (node.type === "django") acc.django++;
+  else if (node.type === "signal") acc.signal++;
+  else acc.fn++;
+  if (node.warning) acc.warnings++;
+  (node.children || []).forEach(c => computeStats(c, acc));
+  return acc;
+}
+
+// ---------------------------------------------------------------------------
+// Render
+// ---------------------------------------------------------------------------
+function renderTree() {
+  const content = document.getElementById("tree-content");
+  if (!epcData) return;
+
+  const stats = computeStats(epcData.tree);
+
+  const statsHtml = `
+    <div id="stats">
+      <div class="stat"><strong>${stats.files.size}</strong> files</div>
+      <div class="stat"><strong>${stats.fn}</strong> functions</div>
+      <div class="stat"><strong>${stats.api}</strong> API calls</div>
+      <div class="stat"><strong>${stats.django}</strong> Django</div>
+      ${stats.signal ? `<div class="stat"><strong>${stats.signal}</strong> signals</div>` : ""}
+      ${stats.warnings ? `<div class="stat" style="color:var(--amber)"><strong>${stats.warnings}</strong> warnings</div>` : ""}
+    </div>
+    <div class="toolbar">
+      <input class="search-box" id="search-input" placeholder="Search functions…" oninput="onSearch(this.value)">
+      <button class="btn" onclick="expandAll()">Expand all</button>
+      <button class="btn" onclick="collapseAll()">Collapse</button>
+      <button class="btn" onclick="document.getElementById('file-input').click()">Load new</button>
+    </div>
+    <div class="tree-root">${renderNode(epcData.tree, true)}</div>
+  `;
+  content.innerHTML = statsHtml;
+}
+
+function renderNode(node, isRoot = false) {
+  const hasChildren = node.children && node.children.length > 0;
+  const isExpanded = expandedIds.has(node.id);
+  const isSelected = selectedId === node.id;
+  const isBoundary = node.boundary;
+
+  const toggleClass = hasChildren ? (isExpanded ? "open" : "") : "leaf";
+  const selectedClass = isSelected ? "selected" : "";
+  const badgeClass = `badge badge-${node.type || "unknown"}`;
+  const badgeLabel = typeName(node.type);
+
+  const name = highlight(node.label || node.id);
+  const desc = node.description ? `<div class="node-desc">${highlight(node.description)}</div>` : "";
+  const filePart = node.file ? `<div class="node-file">${node.file}${node.line ? `:${node.line}` : ""}</div>` : "";
+  const warnPart = node.warning ? `<div class="node-warning">⚠ ${node.warning}</div>` : "";
+
+  const childrenHtml = hasChildren && isExpanded
+    ? `${isBoundary ? '<div class="boundary-hint">╌ API boundary ╌</div>' : ""}
+       <div class="tree-children ${isBoundary ? "boundary-branch" : ""}">${node.children.map(c => renderNode(c)).join("")}</div>`
+    : "";
+
+  return `
+    <div class="node" id="node-${CSS.escape(node.id)}">
+      <div class="node-row ${selectedClass}" onclick="selectNode('${escId(node.id)}', event)">
+        <div class="node-toggle ${toggleClass}" onclick="toggleNode('${escId(node.id)}', event)">▶</div>
+        <div class="node-body">
+          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+            <span class="node-name">${name}</span>
+            <span class="${badgeClass}">${badgeLabel}</span>
+          </div>
+          ${desc}${filePart}${warnPart}
+        </div>
+      </div>
+      ${childrenHtml}
+    </div>`;
+}
+
+function typeName(type) {
+  const map = { event: "@event", fn: "fn", pinia: "pinia", api: "API", django: "Django", signal: "signal", unknown: "?" };
+  return map[type] || type;
+}
+
+function escId(id) { return id.replace(/'/g, "\\'"); }
+
+function highlight(text) {
+  if (!searchTerm || !text) return text || "";
+  const re = new RegExp(`(${searchTerm.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`, "gi");
+  return text.replace(re, '<span class="match">$1</span>');
+}
+
+// ---------------------------------------------------------------------------
+// Interaction
+// ---------------------------------------------------------------------------
+function toggleNode(id, e) {
+  e.stopPropagation();
+  if (expandedIds.has(id)) expandedIds.delete(id);
+  else expandedIds.add(id);
+  renderTree();
+  // Re-select
+  if (selectedId) {
+    const el = document.querySelector(`.node-row.selected`);
+    if (el) el.classList.add("selected");
+  }
+}
+
+function selectNode(id, e) {
+  selectedId = id;
+  const node = findNode(epcData.tree, id);
+  if (node) renderDetail(node);
+  renderTree();
+}
+
+function expandAll() {
+  addAllIds(epcData.tree, expandedIds);
+  renderTree();
+}
+
+function collapseAll() {
+  expandedIds = new Set([epcData.tree.id]);
+  renderTree();
+}
+
+function addAllIds(node, set) {
+  set.add(node.id);
+  (node.children || []).forEach(c => addAllIds(c, set));
+}
+
+function onSearch(val) {
+  searchTerm = val.trim();
+  if (searchTerm) addAllIds(epcData.tree, expandedIds);
+  renderTree();
+}
+
+function findNode(node, id) {
+  if (node.id === id) return node;
+  for (const child of node.children || []) {
+    const found = findNode(child, id);
+    if (found) return found;
+  }
+  return null;
+}
+
+// ---------------------------------------------------------------------------
+// Detail panel
+// ---------------------------------------------------------------------------
+function renderDetail(node) {
+  const panel = document.getElementById("detail-panel");
+
+  const snippetHtml = node.source_snippet && node.source_snippet.length
+    ? `<div class="snippet-header">Source</div>
+       <div class="snippet"><pre>${escapeHtml(node.source_snippet.join("\n"))}</pre></div>`
+    : "";
+
+  const warningHtml = node.warning
+    ? `<div class="warning-box">⚠ ${node.warning}</div>`
+    : "";
+
+  const djangoNote = node.language === "python" && node.type === "django"
+    ? `<div class="django-note">Django/DRF — this is where field overrides, permission checks, and queryset scoping happen. Check for <code>perform_create</code>, <code>get_queryset</code>, and serializer <code>validate_*</code> methods that may transform the data.</div>`
+    : "";
+
+  const childList = node.children && node.children.length
+    ? `<div class="snippet-header" style="margin-top:16px;">Calls (${node.children.length})</div>
+       <div style="display:flex;flex-direction:column;gap:4px;">
+         ${node.children.map(c => `
+           <div style="display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:var(--radius);cursor:pointer;border:0.5px solid var(--border);"
+                onclick="selectNode('${escId(c.id)}', event); scrollToNode('${escId(c.id)}')">
+             <span class="badge badge-${c.type || 'unknown'}" style="font-size:10px;">${typeName(c.type)}</span>
+             <span style="font-size:12px;font-family:var(--mono);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${c.label}</span>
+             <span style="font-size:11px;color:var(--text3);">→</span>
+           </div>`).join("")}
+       </div>`
+    : "";
+
+  panel.innerHTML = `
+    <h2>${escapeHtml(node.label || node.id)}</h2>
+    ${node.description ? `<div class="detail-desc">${escapeHtml(node.description)}</div>` : ""}
+    ${warningHtml}
+    ${djangoNote}
+    <div class="detail-meta">
+      <div class="detail-meta-row"><span class="key">type</span><span class="val">${node.type}</span></div>
+      <div class="detail-meta-row"><span class="key">lang</span><span class="val">${node.language}</span></div>
+      ${node.file ? `<div class="detail-meta-row"><span class="key">file</span><span class="val">${escapeHtml(node.file)}</span></div>` : ""}
+      ${node.line ? `<div class="detail-meta-row"><span class="key">line</span><span class="val">${node.line}</span></div>` : ""}
+      ${node.boundary ? `<div class="detail-meta-row"><span class="key">note</span><span class="val" style="color:var(--amber);">API boundary — crosses Vue → Django</span></div>` : ""}
+    </div>
+    ${snippetHtml}
+    ${childList}
+  `;
+}
+
+function scrollToNode(id) {
+  expandedIds.add(id);
+  renderTree();
+  setTimeout(() => {
+    const el = document.getElementById("node-" + CSS.escape(id));
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }, 50);
+}
+
+function escapeHtml(str) {
+  return (str || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+
+// ---------------------------------------------------------------------------
+// Load from URL param (for direct sharing: epc_viewer.html?file=...)
+// ---------------------------------------------------------------------------
+const urlParams = new URLSearchParams(window.location.search);
+const fileParam = urlParams.get("file");
+if (fileParam) {
+  fetch(fileParam)
+    .then(r => r.json())
+    .then(data => { epcData = data; initViewer(); })
+    .catch(err => console.warn("Could not load:", fileParam, err));
+}
+</script>
+</body>
+</html>

@@ -2,8 +2,16 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 import { loadTracesMap, TracesMap } from './tracesLoader';
+import { traceEpcCommand } from './commands/traceEpc';
 
 export async function activate(context: vscode.ExtensionContext) {
+
+    context.subscriptions.push(
+    vscode.commands.registerCommand(
+        'spadework-companion.traceEpc',
+        () => traceEpcCommand(context)
+    )
+    );
 
     const tracesMap = await loadTracesMap();
 

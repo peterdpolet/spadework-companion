@@ -1,69 +1,18 @@
 {
   "diagrams": [
-    {
-      "id": "three-way-match",
-      "title": "Three-Way Match Flow",
-      "file": "three-way-match.json"
-    },
-    {
-      "id": "jwt-refresh",
-      "title": "JWT Refresh Flow",
-      "file": "jwt-refresh.json"
-    },
-    {
-      "id": "sales-order",
-      "title": "Sales Order Flow",
-      "file": "sales-order.json"
-    },
-    {
-      "id": "print-queue",
-      "title": "Print Queue Flow",
-      "file": "print-queue.json"
-    },
-    {
-      "id": "websocket-chat",
-      "title": "WebSocket Chat Flow",
-      "file": "websocket-chat.json"
-    },
-    {
-      "id": "auto-accounts",
-      "title": "Accounts \u2014 Auto",
-      "file": "auto-accounts.json"
-    },
-    {
-      "id": "auto-chat",
-      "title": "Chat \u2014 Auto",
-      "file": "auto-chat.json"
-    },
-    {
-      "id": "auto-config",
-      "title": "Config \u2014 Auto",
-      "file": "auto-config.json"
-    },
-    {
-      "id": "auto-inventory",
-      "title": "Inventory \u2014 Auto",
-      "file": "auto-inventory.json"
-    },
-    {
-      "id": "auto-matching",
-      "title": "Matching \u2014 Auto",
-      "file": "auto-matching.json"
-    },
-    {
-      "id": "auto-partners",
-      "title": "Partners \u2014 Auto",
-      "file": "auto-partners.json"
-    },
-    {
-      "id": "auto-purchasing",
-      "title": "Purchasing \u2014 Auto",
-      "file": "auto-purchasing.json"
-    },
-    {
-      "id": "auto-sales",
-      "title": "Sales \u2014 Auto",
-      "file": "auto-sales.json"
-    }
+    { "id": "three-way-match", "title": "Three-Way Match Flow", "file": "three-way-match.json" },
+    { "id": "jwt-refresh",     "title": "JWT Refresh Flow",     "file": "jwt-refresh.json"     },
+    { "id": "sales-order",     "title": "Sales Order Flow",     "file": "sales-order.json"     },
+    { "id": "purchase-order",  "title": "Purchase Order Flow",  "file": "purchase-order.json"  },
+    { "id": "print-queue",     "title": "Print Queue Flow",     "file": "print-queue.json"     },
+    { "id": "websocket-chat",  "title": "WebSocket Chat Flow",  "file": "websocket-chat.json"  },
+    { "id": "auto-accounts",   "title": "Accounts — Auto",      "file": "auto-accounts.json"   },
+    { "id": "auto-chat",       "title": "Chat — Auto",          "file": "auto-chat.json"       },
+    { "id": "auto-config",     "title": "Config — Auto",        "file": "auto-config.json"     },
+    { "id": "auto-inventory",  "title": "Inventory — Auto",     "file": "auto-inventory.json"  },
+    { "id": "auto-matching",   "title": "Matching — Auto",      "file": "auto-matching.json"   },
+    { "id": "auto-partners",   "title": "Partners — Auto",      "file": "auto-partners.json"   },
+    { "id": "auto-purchasing", "title": "Purchasing — Auto",    "file": "auto-purchasing.json" },
+    { "id": "auto-sales",      "title": "Sales — Auto",         "file": "auto-sales.json"      }
   ]
 }
