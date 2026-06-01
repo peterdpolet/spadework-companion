@@ -1,0 +1,24 @@
+{
+  "id": "purchase-order",
+  "title": "Purchase Order Flow",
+  "layout": "vertical",
+  "nodes": [
+    { "id": "backend/purchasing/views/purchase_order.py:PurchaseOrderViewSet.perform_create",  "type": "event",    "label": "PurchaseOrderViewSet\n.perform_create",  "file": "backend/purchasing/views/purchase_order.py", "line": 33  },
+    { "id": "backend/purchasing/views/purchase_order.py:PurchaseOrderViewSet.add_line",        "type": "function", "label": "PurchaseOrderViewSet\n.add_line",        "file": "backend/purchasing/views/purchase_order.py", "line": 64  },
+    { "id": "backend/purchasing/views/purchase_order.py:PurchaseOrderViewSet.update_line_notes","type": "function", "label": "PurchaseOrderViewSet\n.update_line_notes","file": "backend/purchasing/views/purchase_order.py", "line": 113 },
+    { "id": "backend/purchasing/views/purchase_order.py:PurchaseOrderViewSet.mark_sent",       "type": "function", "label": "PurchaseOrderViewSet\n.mark_sent",       "file": "backend/purchasing/views/purchase_order.py", "line": 88  },
+    { "id": "backend/purchasing/views/goods_receipt.py:GoodsReceiptViewSet.perform_create",    "type": "function", "label": "GoodsReceiptViewSet\n.perform_create",   "file": "backend/purchasing/views/goods_receipt.py",  "line": 28  },
+    { "id": "backend/purchasing/views/goods_receipt.py:GoodsReceiptViewSet.add_line",          "type": "function", "label": "GoodsReceiptViewSet\n.add_line",         "file": "backend/purchasing/views/goods_receipt.py",  "line": 33  },
+    { "id": "backend/matching/views.py:ThreeWayMatchView.post",                                "type": "function", "label": "ThreeWayMatchView\n.post",               "file": "backend/matching/views.py",                  "line": 341 },
+    { "id": "backend/inventory/print_views.py:print_label",                                    "type": "event",    "label": "print_label",                           "file": "backend/inventory/print_views.py",           "line": 92  }
+  ],
+  "edges": [
+    { "from": "backend/purchasing/views/purchase_order.py:PurchaseOrderViewSet.perform_create",   "to": "backend/purchasing/views/purchase_order.py:PurchaseOrderViewSet.add_line" },
+    { "from": "backend/purchasing/views/purchase_order.py:PurchaseOrderViewSet.add_line",         "to": "backend/purchasing/views/purchase_order.py:PurchaseOrderViewSet.update_line_notes" },
+    { "from": "backend/purchasing/views/purchase_order.py:PurchaseOrderViewSet.update_line_notes","to": "backend/purchasing/views/purchase_order.py:PurchaseOrderViewSet.mark_sent" },
+    { "from": "backend/purchasing/views/purchase_order.py:PurchaseOrderViewSet.mark_sent",        "to": "backend/purchasing/views/goods_receipt.py:GoodsReceiptViewSet.perform_create" },
+    { "from": "backend/purchasing/views/goods_receipt.py:GoodsReceiptViewSet.perform_create",     "to": "backend/purchasing/views/goods_receipt.py:GoodsReceiptViewSet.add_line" },
+    { "from": "backend/purchasing/views/goods_receipt.py:GoodsReceiptViewSet.add_line",           "to": "backend/matching/views.py:ThreeWayMatchView.post" },
+    { "from": "backend/matching/views.py:ThreeWayMatchView.post",                                 "to": "backend/inventory/print_views.py:print_label" }
+  ]
+}
